@@ -44,6 +44,12 @@ export interface UserProfile {
   hasBusinessOwnership?: boolean;
   hasEmployerStock?: boolean;
   hasRentalRealEstate?: boolean;
+  // Additional trigger fields
+  incomeAboveRothLimits?: boolean;
+  hasLargePreTaxIRA?: boolean;
+  employer401kAllowsAfterTax?: boolean;
+  separatedFromService?: boolean;
+  has529Account?: boolean;
 }
 
 // Computed flags for strategy matching
@@ -104,6 +110,8 @@ export interface PersonaStory {
   unlocksStrategies: string[];
 }
 
+export type Evaluator = 'CPA' | 'CFP' | 'Attorney' | 'CPA/CFP' | 'CPA/Attorney' | 'CFP/Attorney' | 'CPA/CFP/Attorney';
+
 export interface Strategy {
   id: string;
   title: string;
@@ -121,6 +129,9 @@ export interface Strategy {
   suppressDuringUnemployment?: boolean;
   // Complexity flag for suppression at lower tiers
   complexity?: 'high' | 'medium' | 'low';
+  // Display metadata
+  triggerReason: string; // What condition triggered visibility
+  evaluator: Evaluator; // Who should evaluate this strategy
 }
 
 // Matched strategy with computed values
@@ -144,6 +155,12 @@ export interface PrimaryTriggers {
   requiresTransitionYear?: boolean;
   requiresLowerIncome?: boolean;
   employmentStatus?: EmploymentStatus[];
+  // Additional explicit triggers
+  requiresIncomeAboveRothLimits?: boolean;
+  requiresNoLargePreTaxIRA?: boolean;
+  requiresEmployer401kAfterTax?: boolean;
+  requiresSeparatedFromService?: boolean;
+  requires529Account?: boolean;
 }
 
 // SUPPRESSION CONDITIONS - Strategy hidden if ANY condition is met

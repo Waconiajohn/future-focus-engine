@@ -10,47 +10,39 @@ const REAL_ESTATE_TIER_ORDER: RealEstateRange[] = ['none', '<250k', '250k-750k',
 // HELPER FUNCTIONS
 // ========================================
 
-// Check if user has meaningful pre-tax retirement accounts
 function hasPreTaxRetirement(profile: UserProfile): boolean {
   return profile.retirementRange !== '<250k';
 }
 
-// Check charitable intent
 function hasCharitableIntent(profile: UserProfile): boolean {
   return profile.charitableGiving !== undefined && profile.charitableGiving !== 'none';
 }
 
-// Get retirement tier index (higher = more assets)
 function getRetirementTierIndex(tier: RetirementRange): number {
   return RETIREMENT_TIER_ORDER.indexOf(tier);
 }
 
-// Get real estate tier index (higher = more equity)
 function getRealEstateTierIndex(tier: RealEstateRange): number {
   return REAL_ESTATE_TIER_ORDER.indexOf(tier);
 }
 
-// Check if retirement tier is below threshold
 function isRetirementBelowTier(profile: UserProfile, threshold: RetirementRange): boolean {
   return getRetirementTierIndex(profile.retirementRange) < getRetirementTierIndex(threshold);
 }
 
-// Check if real estate tier is below threshold
 function isRealEstateBelowTier(profile: UserProfile, threshold: RealEstateRange): boolean {
   return getRealEstateTierIndex(profile.realEstateRange) < getRealEstateTierIndex(threshold);
 }
 
-// Calculate priority boost from retirement tier
 function getRetirementPriorityBoost(profile: UserProfile, priorityTiers?: RetirementRange[]): number {
   if (!priorityTiers) return 0;
   if (priorityTiers.includes(profile.retirementRange)) {
     const tierIndex = getRetirementTierIndex(profile.retirementRange);
-    return tierIndex * 5; // 0, 5, 10, 15, 20, 25
+    return tierIndex * 5;
   }
   return 0;
 }
 
-// Calculate priority boost from real estate tier
 function getRealEstatePriorityBoost(profile: UserProfile, priorityTiers?: RealEstateRange[]): number {
   if (!priorityTiers) return 0;
   if (priorityTiers.includes(profile.realEstateRange)) {
@@ -60,29 +52,24 @@ function getRealEstatePriorityBoost(profile: UserProfile, priorityTiers?: RealEs
   return 0;
 }
 
-// Check suppression conditions
 function shouldSuppressStrategy(profile: UserProfile, conditions?: SuppressionConditions, complexity?: 'high' | 'medium' | 'low'): boolean {
   if (!conditions && !complexity) return false;
   
-  // High-complexity strategies suppressed for <$250k retirement
   if (complexity === 'high' && profile.retirementRange === '<250k') {
     return true;
   }
   
   if (conditions) {
-    // Suppress if below retirement tier threshold
     if (conditions.suppressBelowRetirementTier && 
         isRetirementBelowTier(profile, conditions.suppressBelowRetirementTier)) {
       return true;
     }
     
-    // Suppress if below real estate tier threshold
     if (conditions.suppressBelowRealEstateTier && 
         isRealEstateBelowTier(profile, conditions.suppressBelowRealEstateTier)) {
       return true;
     }
     
-    // Suppress if no real estate
     if (conditions.suppressIfNoRealEstate && profile.realEstateRange === 'none') {
       return true;
     }
@@ -91,40 +78,30 @@ function shouldSuppressStrategy(profile: UserProfile, conditions?: SuppressionCo
   return false;
 }
 
-// Compute dynamic impact based on asset scale
 function computeImpact(
   baseImpact: 'high' | 'medium' | 'low',
   profile: UserProfile,
   strategy: Strategy
 ): 'high' | 'medium' | 'low' {
-  const retirementIndex = getRetirementTierIndex(profile.retirementRange);
   const realEstateIndex = getRealEstateTierIndex(profile.realEstateRange);
   
-  // Impact adjustments based on retirement tier
-  // <$250k: Reduce impact by one level (high → medium → low)
-  // $250k-$1M: Keep base impact
-  // $1M+: Increase urgency for pre-RMD strategies (but don't change impact label)
-  
   if (profile.retirementRange === '<250k') {
-    // Reduce impact for lower balances
     if (baseImpact === 'high') return 'medium';
     if (baseImpact === 'medium') return 'low';
   }
   
-  // For real estate strategies, adjust based on real estate tier
   if (strategy.primaryTriggers.requiresRentalRealEstate) {
-    if (realEstateIndex <= 1) { // none or <$250k
+    if (realEstateIndex <= 1) {
       if (baseImpact === 'high') return 'medium';
       if (baseImpact === 'medium') return 'low';
-    } else if (realEstateIndex === 2) { // $250k-$750k
-      if (baseImpact === 'high') return 'medium'; // Show as medium, not high
+    } else if (realEstateIndex === 2) {
+      if (baseImpact === 'high') return 'medium';
     }
   }
   
   return baseImpact;
 }
 
-// Compute urgency level based on asset scale
 function computeUrgencyLevel(
   profile: UserProfile,
   strategy: Strategy,
@@ -132,8 +109,7 @@ function computeUrgencyLevel(
 ): 'worth-deeper-review' | 'worth-considering' | 'worth-noting' {
   const retirementIndex = getRetirementTierIndex(profile.retirementRange);
   
-  // $1M+ retirement: "worth deeper review" for pre-RMD and conversion strategies
-  if (retirementIndex >= 3) { // $1M+
+  if (retirementIndex >= 3) {
     if (strategy.category === 'withdrawal' || 
         strategy.id === 'roth-conversion-window' ||
         strategy.id === 'rmd-planning') {
@@ -141,17 +117,14 @@ function computeUrgencyLevel(
     }
   }
   
-  // Transition year strategies get elevated urgency
   if (flags.isTransitionYear && strategy.transitionYearPriority && strategy.transitionYearPriority > 70) {
     return 'worth-deeper-review';
   }
   
-  // $250k-$1M: "worth considering"
   if (retirementIndex >= 1 && retirementIndex <= 2) {
     return 'worth-considering';
   }
   
-  // <$250k: "worth noting" (awareness level)
   if (retirementIndex === 0) {
     return 'worth-noting';
   }
@@ -159,6 +132,9 @@ function computeUrgencyLevel(
   return 'worth-considering';
 }
 
+// ========================================
+// STRATEGY DEFINITIONS WITH DETERMINISTIC TRIGGERS
+// ========================================
 export const strategies: Strategy[] = [
   // ========================================
   // TIMING-BASED STRATEGIES
@@ -171,6 +147,8 @@ export const strategies: Strategy[] = [
     impact: 'high',
     category: 'timing',
     transitionYearPriority: 100,
+    triggerReason: 'You indicated lower income or employment transition this year',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       requiresTransitionYear: true
     },
@@ -187,13 +165,48 @@ export const strategies: Strategy[] = [
     impact: 'high',
     category: 'timing',
     transitionYearPriority: 90,
+    triggerReason: 'You have pre-tax retirement accounts AND age < 73 AND income variability indicated',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       minAge: 45,
+      maxAge: 72,
       requiresPreTaxRetirement: true
     },
     priorityModifiers: {
       higherPriorityRetirementTiers: ['500k-1m', '1m-2.5m', '2.5m-5m', '>5m'],
       priorityAgeRange: { min: 55, max: 72 }
+    }
+  },
+  {
+    id: 'backdoor-roth',
+    title: 'Backdoor Roth IRA',
+    description: 'High earners above Roth IRA income limits can still fund Roth accounts through a two-step process: contribute to a non-deductible traditional IRA, then convert to Roth.',
+    whyForYou: 'Often worth exploring when income exceeds Roth contribution limits and you don\'t have large existing pre-tax IRA balances.',
+    impact: 'medium',
+    category: 'structure',
+    triggerReason: 'Income above Roth IRA limits AND no large pre-tax IRA balance AND age < 70',
+    evaluator: 'CPA',
+    primaryTriggers: {
+      maxAge: 69,
+      requiresIncomeAboveRothLimits: true,
+      requiresNoLargePreTaxIRA: true
+    }
+  },
+  {
+    id: 'mega-backdoor-roth',
+    title: 'Mega Backdoor Roth',
+    description: 'Some employer 401(k) plans allow after-tax contributions beyond the standard limit, which can then be converted to Roth. This can significantly increase tax-free retirement savings.',
+    whyForYou: 'Often worth exploring when your employer plan allows after-tax contributions with in-plan conversions.',
+    impact: 'high',
+    category: 'structure',
+    triggerReason: 'Currently employed AND employer 401(k) allows after-tax contributions',
+    evaluator: 'CPA/CFP',
+    primaryTriggers: {
+      employmentStatus: ['employed'],
+      requiresEmployer401kAfterTax: true
+    },
+    priorityModifiers: {
+      basePriorityBoost: 15
     }
   },
   {
@@ -204,6 +217,8 @@ export const strategies: Strategy[] = [
     impact: 'medium',
     category: 'timing',
     transitionYearPriority: 70,
+    triggerReason: 'You have pre-tax retirement accounts requiring income planning',
+    evaluator: 'CPA',
     primaryTriggers: {
       requiresPreTaxRetirement: true
     },
@@ -220,6 +235,8 @@ export const strategies: Strategy[] = [
     impact: 'medium',
     category: 'timing',
     transitionYearPriority: 75,
+    triggerReason: 'Income lower than typical this year',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       requiresLowerIncome: true
     },
@@ -238,6 +255,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'With multiple account types, strategic placement can compound benefits over time.',
     impact: 'medium',
     category: 'structure',
+    triggerReason: 'You have pre-tax retirement accounts with meaningful balances',
+    evaluator: 'CFP',
     primaryTriggers: {
       requiresPreTaxRetirement: true
     },
@@ -252,6 +271,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'If you have HSA access through a high-deductible health plan, maximizing contributions builds a tax-efficient reserve.',
     impact: 'medium',
     category: 'structure',
+    triggerReason: 'Age under 65 AND HDHP eligibility possible',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       maxAge: 65,
       employmentStatus: ['employed', 'unemployed']
@@ -264,6 +285,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'Your household situation allows for continued retirement contributions for both spouses.',
     impact: 'medium',
     category: 'structure',
+    triggerReason: 'Married AND age allows IRA contributions',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       maritalStatus: ['married'],
       maxAge: 73
@@ -276,6 +299,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'With taxable investments alongside retirement accounts, this ongoing strategy can improve after-tax returns.',
     impact: 'medium',
     category: 'structure',
+    triggerReason: 'You have investment accounts with potential loss positions',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       requiresPreTaxRetirement: true
     },
@@ -290,12 +315,28 @@ export const strategies: Strategy[] = [
     whyForYou: 'You indicated employer stock holdings — this specialized strategy applies directly to your situation.',
     impact: 'high',
     category: 'structure',
+    triggerReason: 'Employer stock in qualified plan AND separated from service',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
-      requiresEmployerStock: true
+      requiresEmployerStock: true,
+      requiresSeparatedFromService: true
     },
     priorityModifiers: {
       higherPriorityRetirementTiers: ['500k-1m', '1m-2.5m', '2.5m-5m', '>5m'],
       basePriorityBoost: 15
+    }
+  },
+  {
+    id: 'employer-stock-awareness',
+    title: 'Employer Stock Considerations',
+    description: 'Concentrated employer stock positions carry both opportunity and risk. Understanding your options for diversification and tax-efficient liquidation is important.',
+    whyForYou: 'You indicated employer stock holdings — worth reviewing concentration and planning options.',
+    impact: 'medium',
+    category: 'structure',
+    triggerReason: 'You hold employer stock in a retirement plan',
+    evaluator: 'CFP',
+    primaryTriggers: {
+      requiresEmployerStock: true
     }
   },
 
@@ -310,6 +351,8 @@ export const strategies: Strategy[] = [
     impact: 'high',
     category: 'withdrawal',
     transitionYearPriority: 85,
+    triggerReason: 'Age 60+ AND has pre-tax retirement accounts',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       minAge: 60,
       requiresPreTaxRetirement: true
@@ -326,6 +369,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'Understanding sequencing now helps position assets for efficient withdrawals later.',
     impact: 'medium',
     category: 'withdrawal',
+    triggerReason: 'Age 55+ AND has pre-tax retirement accounts',
+    evaluator: 'CFP',
     primaryTriggers: {
       minAge: 55,
       requiresPreTaxRetirement: true
@@ -342,12 +387,13 @@ export const strategies: Strategy[] = [
     impact: 'low',
     category: 'withdrawal',
     complexity: 'high',
+    triggerReason: 'Age 65+ AND meaningful pre-tax IRA balance',
+    evaluator: 'CFP',
     primaryTriggers: {
       minAge: 65,
       requiresPreTaxRetirement: true
     },
     suppressionConditions: {
-      // QLACs only practical with meaningful IRA balances
       suppressBelowRetirementTier: '500k-1m'
     },
     priorityModifiers: {
@@ -365,6 +411,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'Your age and charitable intent make this a potentially powerful tax-efficient giving strategy.',
     impact: 'high',
     category: 'giving',
+    triggerReason: 'Age 70+ AND has traditional IRA AND charitable giving intent',
+    evaluator: 'CPA',
     primaryTriggers: {
       minAge: 70,
       requiresPreTaxRetirement: true,
@@ -382,6 +430,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'Timing charitable contributions strategically can amplify their tax benefit.',
     impact: 'medium',
     category: 'giving',
+    triggerReason: 'Charitable giving intent indicated',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       requiresCharitableIntent: true
     },
@@ -398,11 +448,12 @@ export const strategies: Strategy[] = [
     impact: 'medium',
     category: 'giving',
     complexity: 'high',
+    triggerReason: 'Charitable intent AND meaningful assets for trust funding',
+    evaluator: 'CPA/Attorney',
     primaryTriggers: {
       requiresCharitableIntent: true
     },
     suppressionConditions: {
-      // CRTs only make sense with meaningful assets
       suppressBelowRetirementTier: '500k-1m'
     },
     priorityModifiers: {
@@ -422,11 +473,12 @@ export const strategies: Strategy[] = [
     whyForYou: 'You indicated rental real estate holdings — this applies if you\'re considering selling or repositioning.',
     impact: 'high',
     category: 'general',
+    triggerReason: 'Owns investment real estate with meaningful equity',
+    evaluator: 'CPA/Attorney',
     primaryTriggers: {
       requiresRentalRealEstate: true
     },
     suppressionConditions: {
-      // 1031 exchanges impractical for very small equity
       suppressBelowRealEstateTier: '250k-750k'
     },
     priorityModifiers: {
@@ -441,11 +493,26 @@ export const strategies: Strategy[] = [
     whyForYou: 'Your real estate holdings add an important dimension to your tax planning.',
     impact: 'medium',
     category: 'general',
+    triggerReason: 'Owns investment/rental real estate',
+    evaluator: 'CPA',
     primaryTriggers: {
       requiresRentalRealEstate: true
     },
     priorityModifiers: {
       higherPriorityRealEstateTiers: ['750k-2m', '>2m']
+    }
+  },
+  {
+    id: 'depreciation-awareness',
+    title: 'Depreciation Recapture Planning',
+    description: 'When selling rental property, depreciation taken reduces your basis and creates recapture income taxed at up to 25%. Understanding this helps with sale timing and exit planning.',
+    whyForYou: 'Rental property depreciation will affect your tax picture upon sale.',
+    impact: 'medium',
+    category: 'general',
+    triggerReason: 'Owns rental real estate (depreciation assumed)',
+    evaluator: 'CPA',
+    primaryTriggers: {
+      requiresRentalRealEstate: true
     }
   },
 
@@ -459,6 +526,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'As a business owner, you may have retirement plan options that significantly increase tax-advantaged savings.',
     impact: 'high',
     category: 'structure',
+    triggerReason: 'Business ownership indicated',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
       requiresBusinessOwnership: true
     },
@@ -473,6 +542,21 @@ export const strategies: Strategy[] = [
     whyForYou: 'Business ownership may qualify you for this significant deduction — worth reviewing with your tax advisor.',
     impact: 'medium',
     category: 'structure',
+    triggerReason: 'Business ownership indicated',
+    evaluator: 'CPA',
+    primaryTriggers: {
+      requiresBusinessOwnership: true
+    }
+  },
+  {
+    id: 'entity-structure',
+    title: 'Entity Structure Review',
+    description: 'The way your business is structured (sole prop, LLC, S-Corp, C-Corp) has significant tax implications. Periodic review ensures optimal structure as circumstances change.',
+    whyForYou: 'Business owners should periodically review whether their entity structure remains optimal.',
+    impact: 'medium',
+    category: 'structure',
+    triggerReason: 'Business ownership indicated',
+    evaluator: 'CPA/Attorney',
     primaryTriggers: {
       requiresBusinessOwnership: true
     }
@@ -489,6 +573,8 @@ export const strategies: Strategy[] = [
     impact: 'medium',
     category: 'timing',
     transitionYearPriority: 80,
+    triggerReason: 'Age under 65 AND in transition year (may need marketplace insurance)',
+    evaluator: 'CFP',
     primaryTriggers: {
       maxAge: 65,
       requiresTransitionYear: true
@@ -501,6 +587,8 @@ export const strategies: Strategy[] = [
     whyForYou: 'Income decisions now will affect your Medicare premiums in future years.',
     impact: 'medium',
     category: 'timing',
+    triggerReason: 'Age 62+ (approaching Medicare, IRMAA lookback applies)',
+    evaluator: 'CFP',
     primaryTriggers: {
       minAge: 62
     },
@@ -520,12 +608,17 @@ export const strategies: Strategy[] = [
     whyForYou: 'If you have 529 accounts with potentially excess funds, this new option is worth understanding.',
     impact: 'low',
     category: 'structure',
+    triggerReason: 'You indicated 529 account ownership',
+    evaluator: 'CPA/CFP',
     primaryTriggers: {
-      // This appears for everyone as general education - it's relatively new legislation
+      requires529Account: true
     }
   }
 ];
 
+// ========================================
+// MATCH STRATEGIES FUNCTION
+// ========================================
 export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
   const flags = computeTransitionFlags(profile);
   const age = profile.age;
@@ -538,9 +631,7 @@ export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
       return false;
     }
     
-    // ========================================
-    // SUPPRESSION CHECKS - Asset-based practicality
-    // ========================================
+    // Suppression checks - asset-based practicality
     if (shouldSuppressStrategy(profile, strategy.suppressionConditions, strategy.complexity)) {
       return false;
     }
@@ -592,47 +683,58 @@ export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
       return false;
     }
     
+    // Additional explicit triggers
+    if (triggers.requiresIncomeAboveRothLimits && !profile.incomeAboveRothLimits) {
+      return false;
+    }
+    
+    if (triggers.requiresNoLargePreTaxIRA && profile.hasLargePreTaxIRA) {
+      return false;
+    }
+    
+    if (triggers.requiresEmployer401kAfterTax && !profile.employer401kAllowsAfterTax) {
+      return false;
+    }
+    
+    if (triggers.requiresSeparatedFromService && !profile.separatedFromService) {
+      return false;
+    }
+    
+    if (triggers.requires529Account && !profile.has529Account) {
+      return false;
+    }
+    
     return true;
   });
 
-  // ========================================
-  // CALCULATE COMPUTED VALUES & SORT
-  // ========================================
+  // Calculate computed values and sort
   const scoredStrategies: MatchedStrategy[] = matchedStrategies.map(strategy => {
     let priorityScore = 0;
     const modifiers = strategy.priorityModifiers;
     
-    // Base priority from transition year
     if (flags.isTransitionYear && strategy.transitionYearPriority) {
       priorityScore += strategy.transitionYearPriority;
     }
     
-    // Impact-based score (using computed impact)
     const computedImpactValue = computeImpact(strategy.impact, profile, strategy);
     const impactScore = { high: 30, medium: 20, low: 10 };
     priorityScore += impactScore[computedImpactValue];
     
     if (modifiers) {
-      // Retirement tier boost
       priorityScore += getRetirementPriorityBoost(profile, modifiers.higherPriorityRetirementTiers);
-      
-      // Real estate tier boost
       priorityScore += getRealEstatePriorityBoost(profile, modifiers.higherPriorityRealEstateTiers);
       
-      // Age range boost
       if (modifiers.priorityAgeRange) {
         if (age >= modifiers.priorityAgeRange.min && age <= modifiers.priorityAgeRange.max) {
           priorityScore += 15;
         }
       }
       
-      // Base boost
       if (modifiers.basePriorityBoost) {
         priorityScore += modifiers.basePriorityBoost;
       }
     }
     
-    // Compute urgency level
     const urgencyLevel = computeUrgencyLevel(profile, strategy, flags);
     
     return {
@@ -643,7 +745,6 @@ export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
     };
   });
 
-  // Sort by priority score (highest first)
   scoredStrategies.sort((a, b) => b.priorityScore - a.priorityScore);
 
   return scoredStrategies;
