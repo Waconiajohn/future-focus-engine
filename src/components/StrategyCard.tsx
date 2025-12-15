@@ -46,7 +46,18 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
       )}
       style={{ animationDelay: `${(index + 1) * 100}ms` }}
     >
-      <div className="flex items-start justify-between gap-3 mb-4">
+      {/* Why This Appears - FIRST */}
+      <div className="mb-4 pb-4 border-b border-border/50">
+        <p className="text-sm font-medium text-sage mb-1">
+          Why this appears for you
+        </p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {strategy.whyForYou}
+        </p>
+      </div>
+
+      {/* Title & Impact Badge */}
+      <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             {isTimingSensitive && (
@@ -72,18 +83,10 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
         </div>
       </div>
       
-      <p className="text-foreground/80 leading-relaxed mb-4">
+      {/* Plain-English Explanation */}
+      <p className="text-foreground/80 leading-relaxed text-sm">
         {strategy.description}
       </p>
-      
-      <div className="pt-4 border-t border-border/50">
-        <p className="text-sm font-medium text-sage mb-1">
-          Why this appears for you
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {strategy.whyForYou}
-        </p>
-      </div>
     </div>
   );
 }
