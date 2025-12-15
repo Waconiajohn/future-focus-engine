@@ -63,24 +63,108 @@ function shouldSuppressStrategy(profile: UserProfile, conditions?: SuppressionCo
   return false;
 }
 
-function computeImpact(baseImpact: 'high' | 'medium' | 'low', profile: UserProfile, strategy: Strategy): 'high' | 'medium' | 'low' {
+// ========================================
+// GRANULAR IMPACT COMPUTATION
+// Driven by objective thresholds, not subjective judgment
+// ========================================
+function computeImpact(profile: UserProfile, strategy: Strategy, flags: TransitionYearFlags): 'high' | 'medium' | 'low' {
+  const retirementIndex = getRetirementTierIndex(profile.retirementRange);
   const realEstateIndex = getRealEstateTierIndex(profile.realEstateRange);
+  const charitableLevel = profile.charitableGiving || 'none';
   
-  if (profile.retirementRange === '<250k') {
-    if (baseImpact === 'high') return 'medium';
-    if (baseImpact === 'medium') return 'low';
+  // Strategy-specific impact rules based on objective thresholds
+  switch (strategy.id) {
+    // ROTH CONVERSION: Based on pre-tax assets + income variability
+    case 'roth-conversion-window':
+    case 'lower-income-planning':
+      // High: $1M+ with income variability
+      if (retirementIndex >= 3 && flags.isTransitionYear) return 'high';
+      // Medium: $250k–$1M
+      if (retirementIndex >= 1 && retirementIndex <= 2) return 'medium';
+      // Low: pre-tax assets < $250k
+      return 'low';
+    
+    // QCD / RMD PLANNING: Based on charitable giving level + RMD exposure
+    case 'qcd-qualified-charitable':
+    case 'rmd-planning':
+      // High: $15k+ charitable and meaningful RMD exposure ($1M+)
+      if ((charitableLevel === '25k-100k' || charitableLevel === '>100k') && retirementIndex >= 3) return 'high';
+      // Medium: $5k–$15k charitable OR $1M+ retirement
+      if (charitableLevel === '5k-25k' || retirementIndex >= 3) return 'medium';
+      // Low: charitable giving <$5k/year
+      return 'low';
+    
+    // 1031 EXCHANGE: Based on real estate equity
+    case '1031-exchange':
+      // High: large embedded gains ($750k+ equity)
+      if (realEstateIndex >= 3) return 'high';
+      // Medium: $250k–$750k equity
+      if (realEstateIndex === 2) return 'medium';
+      // Low: single small rental (<$250k)
+      return 'low';
+    
+    // REAL ESTATE STRATEGIES: Based on equity level
+    case 'real-estate-awareness':
+    case 'depreciation-awareness':
+      if (realEstateIndex >= 3) return 'high';
+      if (realEstateIndex === 2) return 'medium';
+      return 'low';
+    
+    // NUA: Based on employer stock concentration (assume high if flagged)
+    case 'nua-employer-stock':
+      // High if $500k+ retirement (likely meaningful stock position)
+      if (retirementIndex >= 2) return 'high';
+      return 'medium';
+    
+    // BUSINESS STRATEGIES: Based on retirement tier (proxy for business size)
+    case 'business-retirement-plans':
+    case 'qbi-deduction':
+    case 'entity-structure':
+      if (retirementIndex >= 3) return 'high';
+      if (retirementIndex >= 1) return 'medium';
+      return 'low';
+    
+    // CHARITABLE STRATEGIES: Based on giving level
+    case 'charitable-bunching':
+    case 'crt-charitable-trust':
+      if (charitableLevel === '25k-100k' || charitableLevel === '>100k') return 'high';
+      if (charitableLevel === '5k-25k') return 'medium';
+      return 'low';
+    
+    // WITHDRAWAL STRATEGIES: Based on pre-tax balance
+    case 'asset-sequencing':
+    case 'qlac-awareness':
+      if (retirementIndex >= 3) return 'high';
+      if (retirementIndex >= 1) return 'medium';
+      return 'low';
+    
+    // BACKDOOR STRATEGIES: Medium unless high assets
+    case 'backdoor-roth':
+    case 'mega-backdoor-roth':
+      if (retirementIndex >= 3) return 'high';
+      return 'medium';
+    
+    // HEALTHCARE/MEDICARE: Based on timing relevance
+    case 'healthcare-subsidy-awareness':
+      if (flags.isTransitionYear && profile.age >= 55 && profile.age < 65) return 'high';
+      if (flags.isTransitionYear) return 'medium';
+      return 'low';
+    
+    case 'medicare-planning':
+      // High if approaching Medicare with large assets
+      if (profile.age >= 63 && profile.age <= 65 && retirementIndex >= 3) return 'high';
+      if (profile.age >= 62 && retirementIndex >= 2) return 'medium';
+      return 'low';
+    
+    // DEFAULT: Use base impact adjusted by retirement tier
+    default:
+      const baseImpact = strategy.impact;
+      if (retirementIndex === 0) {
+        if (baseImpact === 'high') return 'medium';
+        if (baseImpact === 'medium') return 'low';
+      }
+      return baseImpact;
   }
-  
-  if (strategy.primaryTriggers.requiresRentalRealEstate) {
-    if (realEstateIndex <= 1) {
-      if (baseImpact === 'high') return 'medium';
-      if (baseImpact === 'medium') return 'low';
-    } else if (realEstateIndex === 2) {
-      if (baseImpact === 'high') return 'medium';
-    }
-  }
-  
-  return baseImpact;
 }
 
 function computeUrgencyLevel(profile: UserProfile, strategy: Strategy, flags: TransitionYearFlags): 'worth-deeper-review' | 'worth-considering' | 'worth-noting' {
@@ -100,6 +184,22 @@ function computeUrgencyLevel(profile: UserProfile, strategy: Strategy, flags: Tr
   if (retirementIndex === 0) return 'worth-noting';
   
   return 'worth-considering';
+}
+
+// Guardrail: Limit high-impact strategies to max 3
+function applyHighImpactGuardrail(strategies: MatchedStrategy[]): MatchedStrategy[] {
+  let highCount = 0;
+  
+  return strategies.map(strategy => {
+    if (strategy.computedImpact === 'high') {
+      highCount++;
+      if (highCount > 3) {
+        // Downgrade to medium
+        return { ...strategy, computedImpact: 'medium' as const };
+      }
+    }
+    return strategy;
+  });
 }
 
 // ========================================
@@ -564,7 +664,7 @@ export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
     return true;
   });
 
-  const scoredStrategies: MatchedStrategy[] = matchedStrategies.map(strategy => {
+  let scoredStrategies: MatchedStrategy[] = matchedStrategies.map(strategy => {
     let priorityScore = 0;
     const modifiers = strategy.priorityModifiers;
     
@@ -572,7 +672,7 @@ export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
       priorityScore += strategy.transitionYearPriority;
     }
     
-    const computedImpactValue = computeImpact(strategy.impact, profile, strategy);
+    const computedImpactValue = computeImpact(profile, strategy, flags);
     const impactScore = { high: 30, medium: 20, low: 10 };
     priorityScore += impactScore[computedImpactValue];
     
@@ -592,7 +692,12 @@ export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
     return { ...strategy, computedImpact: computedImpactValue, urgencyLevel, priorityScore };
   });
 
+  // Sort by priority score (highest first)
   scoredStrategies.sort((a, b) => b.priorityScore - a.priorityScore);
+  
+  // Apply guardrail: limit high-impact strategies to max 3
+  scoredStrategies = applyHighImpactGuardrail(scoredStrategies);
+  
   return scoredStrategies;
 }
 
