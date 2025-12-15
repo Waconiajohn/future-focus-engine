@@ -6,7 +6,16 @@ import { HouseholdStep } from "@/components/steps/HouseholdStep";
 import { ResultsStep } from "@/components/steps/ResultsStep";
 import { matchStories } from "@/data/stories";
 import { matchStrategies } from "@/data/strategies";
-import { UserProfile, MaritalStatus, RetirementRange, RealEstateRange, EmploymentStatus, PersonaStory, Strategy } from "@/types/persona";
+import { 
+  UserProfile, 
+  MaritalStatus, 
+  RetirementRange, 
+  RealEstateRange, 
+  EmploymentStatus, 
+  PersonaStory, 
+  Strategy,
+  UnemploymentDetails
+} from "@/types/persona";
 
 type Step = 'intro' | 'persona' | 'stories' | 'household' | 'results';
 
@@ -47,9 +56,9 @@ export default function Index() {
 
   const handleHouseholdComplete = (data: {
     employmentStatus: EmploymentStatus;
+    unemploymentDetails?: UnemploymentDetails;
     spouseEmploymentStatus?: EmploymentStatus;
-    unemploymentDuration?: string;
-    expectReturnToWork?: 'yes' | 'no' | 'not-sure';
+    spouseUnemploymentDetails?: UnemploymentDetails;
   }) => {
     const fullProfile: UserProfile = {
       firstName: profile.firstName!,
@@ -57,7 +66,10 @@ export default function Index() {
       maritalStatus: profile.maritalStatus!,
       retirementRange: profile.retirementRange!,
       realEstateRange: profile.realEstateRange!,
-      ...data,
+      employmentStatus: data.employmentStatus,
+      unemploymentDetails: data.unemploymentDetails,
+      spouseEmploymentStatus: data.spouseEmploymentStatus,
+      spouseUnemploymentDetails: data.spouseUnemploymentDetails,
     };
     
     setProfile(fullProfile);
