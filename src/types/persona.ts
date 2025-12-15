@@ -27,6 +27,8 @@ export interface UnemploymentDetails {
   expectReturnWithin12Months: 'yes' | 'no' | 'not-sure';
 }
 
+export type CharitableRange = 'none' | '<5k' | '5k-25k' | '25k-100k' | '>100k';
+
 export interface UserProfile {
   firstName: string;
   age: number;
@@ -37,6 +39,11 @@ export interface UserProfile {
   unemploymentDetails?: UnemploymentDetails;
   spouseEmploymentStatus?: EmploymentStatus;
   spouseUnemploymentDetails?: UnemploymentDetails;
+  // Life context fields
+  charitableGiving?: CharitableRange;
+  hasBusinessOwnership?: boolean;
+  hasEmployerStock?: boolean;
+  hasRentalRealEstate?: boolean;
 }
 
 // Computed flags for strategy matching

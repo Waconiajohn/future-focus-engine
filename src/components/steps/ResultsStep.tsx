@@ -124,10 +124,10 @@ export function ResultsStep({ profile, strategies, onRestart }: ResultsStepProps
               "{transitionMessage}"
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Strategies Worth Exploring
+              Strategies Worth Exploring Based on What You Shared
             </h1>
             <p className="text-muted-foreground">
-              Based on what you shared, {profile.firstName}
+              {profile.firstName}, here are opportunities that may be relevant to your situation
               {flags.isTransitionYear && (
                 <span className="text-gold font-medium"> • Transition year insights included</span>
               )}
@@ -155,6 +155,51 @@ export function ResultsStep({ profile, strategies, onRestart }: ResultsStepProps
 
           {/* Cautionary Notes */}
           <CautionaryNotes profile={profile} />
+
+          {/* Professional Conversation Prep Section */}
+          <div className="bg-card rounded-2xl p-8 mb-8 opacity-0 animate-fade-up animation-delay-450">
+            <h2 className="font-serif text-2xl font-semibold text-foreground mb-6">
+              How to Use This With Your CPA or Attorney
+            </h2>
+            
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-sage-light flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-sage font-serif font-bold text-sm">1</span>
+                </div>
+                <div>
+                  <h3 className="font-medium mb-1">These are conversation starters</h3>
+                  <p className="text-sm text-muted-foreground">
+                    The strategies above identify topics worth discussing — they're not recommendations or instructions.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-sage-light flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-sage font-serif font-bold text-sm">2</span>
+                </div>
+                <div>
+                  <h3 className="font-medium mb-1">Some may not apply after full review</h3>
+                  <p className="text-sm text-muted-foreground">
+                    A qualified professional will evaluate your complete picture — income, deductions, existing plans, and goals — to determine what actually fits.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-sage-light flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-sage font-serif font-bold text-sm">3</span>
+                </div>
+                <div>
+                  <h3 className="font-medium mb-1">Coordination matters</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Tax strategies often interact with each other. What works in isolation may conflict when combined. Professional guidance helps navigate these trade-offs.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* CTA Section */}
           <div className="bg-sage-light/50 rounded-2xl p-8 text-center opacity-0 animate-fade-up animation-delay-500">

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { ArrowRight, ArrowLeft } from "lucide-react";
-import { EmploymentStatus, MaritalStatus, UnemploymentDetails, UnemploymentDuration } from "@/types/persona";
+import { EmploymentStatus, MaritalStatus, UnemploymentDetails, UnemploymentDuration, CharitableRange } from "@/types/persona";
 import { cn } from "@/lib/utils";
 
 interface HouseholdStepProps {
@@ -13,6 +13,10 @@ interface HouseholdStepProps {
     unemploymentDetails?: UnemploymentDetails;
     spouseEmploymentStatus?: EmploymentStatus;
     spouseUnemploymentDetails?: UnemploymentDetails;
+    charitableGiving?: CharitableRange;
+    hasBusinessOwnership?: boolean;
+    hasEmployerStock?: boolean;
+    hasRentalRealEstate?: boolean;
   }) => void;
   onBack: () => void;
 }
@@ -36,6 +40,14 @@ const returnOptions: { value: 'yes' | 'no' | 'not-sure'; label: string; descript
   { value: 'not-sure', label: 'Not sure yet', description: 'Still evaluating options' },
 ];
 
+const charitableOptions: { value: CharitableRange; label: string }[] = [
+  { value: 'none', label: 'None or minimal' },
+  { value: '<5k', label: 'Less than $5,000/year' },
+  { value: '5k-25k', label: '$5,000 – $25,000/year' },
+  { value: '25k-100k', label: '$25,000 – $100,000/year' },
+  { value: '>100k', label: 'More than $100,000/year' },
+];
+
 type Step = 
   | 'primary-employment'
   | 'primary-duration'
@@ -44,7 +56,11 @@ type Step =
   | 'spouse-employment'
   | 'spouse-duration'
   | 'spouse-income-lower'
-  | 'spouse-return';
+  | 'spouse-return'
+  | 'charitable-giving'
+  | 'business-ownership'
+  | 'employer-stock'
+  | 'rental-real-estate';
 
 export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdStepProps) {
   const [currentStep, setCurrentStep] = useState<Step>('primary-employment');
@@ -61,6 +77,12 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
   const [spouseIncomeLower, setSpouseIncomeLower] = useState<boolean | null>(null);
   const [spouseExpectReturn, setSpouseExpectReturn] = useState<'yes' | 'no' | 'not-sure' | "">("");
 
+  // Life context state
+  const [charitableGiving, setCharitableGiving] = useState<CharitableRange | "">("");
+  const [hasBusinessOwnership, setHasBusinessOwnership] = useState<boolean | null>(null);
+  const [hasEmployerStock, setHasEmployerStock] = useState<boolean | null>(null);
+  const [hasRentalRealEstate, setHasRentalRealEstate] = useState<boolean | null>(null);
+
   const getStepFlow = (): Step[] => {
     const flow: Step[] = ['primary-employment'];
     
@@ -74,6 +96,9 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
         flow.push('spouse-duration', 'spouse-income-lower', 'spouse-return');
       }
     }
+
+    // Add life context questions
+    flow.push('charitable-giving', 'business-ownership', 'employer-stock', 'rental-real-estate');
     
     return flow;
   };
@@ -116,6 +141,10 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
       unemploymentDetails: primaryDetails,
       spouseEmploymentStatus: maritalStatus === 'married' ? spouseEmploymentStatus as EmploymentStatus : undefined,
       spouseUnemploymentDetails: spouseDetails,
+      charitableGiving: charitableGiving as CharitableRange || undefined,
+      hasBusinessOwnership: hasBusinessOwnership ?? undefined,
+      hasEmployerStock: hasEmployerStock ?? undefined,
+      hasRentalRealEstate: hasRentalRealEstate ?? undefined,
     });
   };
 
@@ -144,6 +173,10 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
       case 'spouse-duration': return spouseDuration !== "";
       case 'spouse-income-lower': return spouseIncomeLower !== null;
       case 'spouse-return': return spouseExpectReturn !== "";
+      case 'charitable-giving': return charitableGiving !== "";
+      case 'business-ownership': return hasBusinessOwnership !== null;
+      case 'employer-stock': return hasEmployerStock !== null;
+      case 'rental-real-estate': return hasRentalRealEstate !== null;
       default: return false;
     }
   };
@@ -452,6 +485,158 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
                   </span>
                 </label>
               ))}
+            </RadioGroup>
+          </div>
+        );
+
+      case 'charitable-giving':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Do you make charitable gifts?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Charitable giving can unlock specific tax strategies
+            </p>
+            <RadioGroup
+              value={charitableGiving}
+              onValueChange={(value) => setCharitableGiving(value as CharitableRange)}
+              className="space-y-3"
+            >
+              {charitableOptions.map((option) => (
+                <label
+                  key={option.value}
+                  className={cn(
+                    "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    charitableGiving === option.value
+                      ? "border-sage bg-sage-light/50"
+                      : "border-border hover:border-sage/50"
+                  )}
+                >
+                  <RadioGroupItem value={option.value} id={`charitable-${option.value}`} />
+                  <span className="font-medium">{option.label}</span>
+                </label>
+              ))}
+            </RadioGroup>
+          </div>
+        );
+
+      case 'business-ownership':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Do you own a business?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Business ownership opens additional planning options
+            </p>
+            <RadioGroup
+              value={hasBusinessOwnership === null ? "" : hasBusinessOwnership ? "yes" : "no"}
+              onValueChange={(value) => setHasBusinessOwnership(value === "yes")}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  hasBusinessOwnership === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="yes" id="business-yes" />
+                <span className="font-medium">Yes</span>
+              </label>
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  hasBusinessOwnership === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="no" id="business-no" />
+                <span className="font-medium">No</span>
+              </label>
+            </RadioGroup>
+          </div>
+        );
+
+      case 'employer-stock':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Do you hold employer stock?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Company stock in retirement accounts has unique considerations
+            </p>
+            <RadioGroup
+              value={hasEmployerStock === null ? "" : hasEmployerStock ? "yes" : "no"}
+              onValueChange={(value) => setHasEmployerStock(value === "yes")}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  hasEmployerStock === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="yes" id="employer-stock-yes" />
+                <span className="font-medium">Yes</span>
+              </label>
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  hasEmployerStock === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="no" id="employer-stock-no" />
+                <span className="font-medium">No</span>
+              </label>
+            </RadioGroup>
+          </div>
+        );
+
+      case 'rental-real-estate':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Do you own rental real estate?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Investment properties create unique tax considerations
+            </p>
+            <RadioGroup
+              value={hasRentalRealEstate === null ? "" : hasRentalRealEstate ? "yes" : "no"}
+              onValueChange={(value) => setHasRentalRealEstate(value === "yes")}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  hasRentalRealEstate === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="yes" id="rental-yes" />
+                <span className="font-medium">Yes</span>
+              </label>
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  hasRentalRealEstate === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="no" id="rental-no" />
+                <span className="font-medium">No</span>
+              </label>
             </RadioGroup>
           </div>
         );
