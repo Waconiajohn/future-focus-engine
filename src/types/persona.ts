@@ -15,16 +15,33 @@ export type RealEstateRange =
   | '750k-2m' 
   | '>2m';
 
-export type EmploymentStatus = 'employed' | 'unemployed' | 'retired';
+export type EmploymentStatus = 'employed' | 'unemployed' | 'retired' | 'self-employed' | 'consulting';
 
 export type UnemploymentDuration = '<3months' | '3-6months' | '6-12months' | '>12months';
 
 export type AgeBand = '45-49' | '50-54' | '55-59' | '60-69' | '70+';
 
+export type SeveranceRange = 'none' | '<50k' | '50k-150k' | '150k-300k' | '>300k';
+export type SeveranceType = 'lump-sum' | 'over-time';
+export type UIRange = 'none' | '<2k' | '2k-4k' | '>4k';
+export type CurrentYearIncomeComparison = 'higher' | 'similar' | 'lower' | 'unsure';
+
 export interface UnemploymentDetails {
   duration: UnemploymentDuration;
   incomeLowerThanTypical: boolean;
   expectReturnWithin12Months: 'yes' | 'no' | 'not-sure';
+  // New severance/UI fields
+  receivedSeverance?: boolean;
+  severanceRange?: SeveranceRange;
+  severanceType?: SeveranceType;
+  receivingUI?: boolean;
+  uiRange?: UIRange;
+  currentYearIncomeComparison?: CurrentYearIncomeComparison;
+}
+
+export interface SelfEmployedDetails {
+  incomeFluctuatesQuarterly?: boolean;
+  hasPositiveCashFlow?: boolean;
 }
 
 export type CharitableRange = 'none' | '<5k' | '5k-25k' | '25k-100k' | '>100k';
@@ -39,8 +56,10 @@ export interface UserProfile {
   realEstateRange: RealEstateRange;
   employmentStatus: EmploymentStatus;
   unemploymentDetails?: UnemploymentDetails;
+  selfEmployedDetails?: SelfEmployedDetails;
   spouseEmploymentStatus?: EmploymentStatus;
   spouseUnemploymentDetails?: UnemploymentDetails;
+  spouseSelfEmployedDetails?: SelfEmployedDetails;
   
   // Core asset flags
   hasTraditionalIRA?: boolean;

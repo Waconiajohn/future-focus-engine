@@ -30,7 +30,30 @@ export function IntroStep({ onStart }: IntroStepProps) {
               Answer a few simple questions to see which retirement tax planning 
               opportunities might be relevant to your situation.
             </p>
+          </div>
 
+          {/* Why This Is Often Overlooked */}
+          <div className="bg-card/50 rounded-2xl p-6 mb-12 text-left opacity-0 animate-fade-up animation-delay-150">
+            <h2 className="font-serif text-xl font-semibold text-foreground mb-4">
+              Why This Is Often Overlooked
+            </h2>
+            <div className="space-y-3 text-foreground/80 text-sm leading-relaxed">
+              <p>
+                Many financial advisory relationships are built around investment management, not multi-year tax planning. This isn't a shortcoming—it's how most engagements are structured.
+              </p>
+              <p>
+                Coordinated tax analysis often requires collaboration between CPAs and financial advisors, and many professionals prefer to stay within their lane to avoid liability.
+              </p>
+              <p>
+                Timing windows—unemployment, early retirement, business sales—create opportunities that are easy to miss without a deliberate process.
+              </p>
+              <p>
+                This tool is designed to help identify what may be worth discussing with qualified professionals who can evaluate your specific situation.
+              </p>
+              <p className="text-muted-foreground italic pt-2 border-t border-border/50">
+                This tool doesn't provide tax advice—it helps you ask better questions at the right time.
+              </p>
+            </div>
           </div>
 
           {/* What This Does / Doesn't Do */}
