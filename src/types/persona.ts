@@ -29,6 +29,8 @@ export interface UnemploymentDetails {
 
 export type CharitableRange = 'none' | '<5k' | '5k-25k' | '25k-100k' | '>100k';
 
+export type RiskTolerance = 'low' | 'moderate' | 'high';
+
 export interface UserProfile {
   firstName: string;
   age: number;
@@ -39,17 +41,67 @@ export interface UserProfile {
   unemploymentDetails?: UnemploymentDetails;
   spouseEmploymentStatus?: EmploymentStatus;
   spouseUnemploymentDetails?: UnemploymentDetails;
+  
+  // Core asset flags
+  hasTraditionalIRA?: boolean;
+  has401k?: boolean;
+  hasTaxableBrokerage?: boolean;
+  hasMultipleAccountTypes?: boolean;
+  
   // Life context fields
   charitableGiving?: CharitableRange;
   hasBusinessOwnership?: boolean;
   hasEmployerStock?: boolean;
   hasRentalRealEstate?: boolean;
-  // Additional trigger fields
+  
+  // Roth-related triggers
   incomeAboveRothLimits?: boolean;
   hasLargePreTaxIRA?: boolean;
   employer401kAllowsAfterTax?: boolean;
+  max401kContributions?: boolean;
+  
+  // Employment/separation triggers
   separatedFromService?: boolean;
+  hasExecutiveCompensation?: boolean;
+  
+  // Education & family
   has529Account?: boolean;
+  educationFundingIntent?: boolean;
+  familyWealthTransferIntent?: boolean;
+  multiGenerationalPlanningIntent?: boolean;
+  
+  // Real estate specific
+  intendsToSellProperty?: boolean;
+  sellingPrimaryResidence?: boolean;
+  ownsDepreciatedRealEstate?: boolean;
+  ownsLargeLandParcel?: boolean;
+  activeParticipationInRental?: boolean;
+  
+  // Investment/business
+  hasHighlyAppreciatedAssets?: boolean;
+  hasEmbeddedCapitalGains?: boolean;
+  hasRealizedCapitalGains?: boolean;
+  ownsCCorpStock?: boolean;
+  qsbsHoldingPeriod5Years?: boolean;
+  sellingBusinessOrRealEstate?: boolean;
+  
+  // Income/tax context
+  highTaxBracket?: boolean;
+  incomeSpike?: boolean;
+  highIncomeYear?: boolean;
+  incomeSmoothingPreference?: boolean;
+  expectedFutureTaxRatesHigher?: boolean;
+  
+  // Healthcare
+  enrolledInHDHP?: boolean;
+  
+  // Planning preferences
+  longevityConcern?: boolean;
+  incomeReplacementNeed?: boolean;
+  estatePlanningConcern?: boolean;
+  riskTolerance?: RiskTolerance;
+  hasMarketVolatility?: boolean;
+  hasTaxableFixedIncome?: boolean;
 }
 
 // Computed flags for strategy matching
@@ -58,8 +110,9 @@ export interface TransitionYearFlags {
   anyoneUnemployed: boolean;
   bothUnemployed: boolean;
   incomeLowerThanTypical: boolean;
-  shortTermTransition: boolean; // expects return within 12 months
-  longTermTransition: boolean; // doesn't expect return or unsure
+  shortTermTransition: boolean;
+  longTermTransition: boolean;
+  incomeVolatility: boolean;
 }
 
 export function computeTransitionFlags(profile: UserProfile): TransitionYearFlags {
@@ -68,12 +121,10 @@ export function computeTransitionFlags(profile: UserProfile): TransitionYearFlag
   const anyoneUnemployed = primaryUnemployed || spouseUnemployed;
   const bothUnemployed = profile.maritalStatus === 'married' && primaryUnemployed && spouseUnemployed;
 
-  // Check if income is lower than typical for anyone unemployed
   const primaryLowerIncome = primaryUnemployed && profile.unemploymentDetails?.incomeLowerThanTypical;
   const spouseLowerIncome = spouseUnemployed && profile.spouseUnemploymentDetails?.incomeLowerThanTypical;
   const incomeLowerThanTypical = primaryLowerIncome || spouseLowerIncome || false;
 
-  // Determine if this is a short-term or long-term transition
   const primaryExpectsReturn = profile.unemploymentDetails?.expectReturnWithin12Months === 'yes';
   const spouseExpectsReturn = profile.spouseUnemploymentDetails?.expectReturnWithin12Months === 'yes';
   const shortTermTransition = (primaryUnemployed && primaryExpectsReturn) || 
@@ -87,13 +138,17 @@ export function computeTransitionFlags(profile: UserProfile): TransitionYearFlag
      profile.spouseUnemploymentDetails?.expectReturnWithin12Months === 'not-sure');
   const longTermTransition = primaryLongTerm || spouseLongTerm;
 
+  // Income volatility: unemployed OR income spike OR lower than typical
+  const incomeVolatility = anyoneUnemployed || incomeLowerThanTypical || profile.incomeSpike || false;
+
   return {
     isTransitionYear: anyoneUnemployed || incomeLowerThanTypical,
     anyoneUnemployed,
     bothUnemployed,
     incomeLowerThanTypical,
     shortTermTransition,
-    longTermTransition
+    longTermTransition,
+    incomeVolatility
   };
 }
 
@@ -115,90 +170,112 @@ export type Evaluator = 'CPA' | 'CFP' | 'Attorney' | 'CPA/CFP' | 'CPA/Attorney' 
 export interface Strategy {
   id: string;
   title: string;
-  // CPA-friendly card content
-  whatThisIs: string; // Concise, neutral definition
-  whyItAppears: string; // Which inputs triggered visibility
-  whyOftenExplored: string; // High-level rationale (no promises)
-  evaluator: Evaluator; // Who typically evaluates this
-  // Legacy fields for backward compatibility
+  whatThisIs: string;
+  whyItAppears: string;
+  whyOftenExplored: string;
+  evaluator: Evaluator;
   description: string;
   whyForYou: string;
   impact: 'high' | 'medium' | 'low';
-  category: 'timing' | 'structure' | 'withdrawal' | 'giving' | 'general';
-  // Primary triggers - ALL must be true for strategy to appear
+  category: 'timing' | 'structure' | 'withdrawal' | 'giving' | 'general' | 'real-estate' | 'business' | 'investment';
   primaryTriggers: PrimaryTriggers;
-  // Modifiers - affect priority/urgency, not eligibility
   priorityModifiers?: PriorityModifiers;
-  // Suppression conditions - strategy hidden if ANY condition met
   suppressionConditions?: SuppressionConditions;
   transitionYearPriority?: number;
   suppressDuringUnemployment?: boolean;
-  // Complexity flag for suppression at lower tiers
   complexity?: 'high' | 'medium' | 'low';
-  // Display metadata
   triggerReason: string;
 }
 
-// Matched strategy with computed values
 export interface MatchedStrategy extends Strategy {
   computedImpact: 'high' | 'medium' | 'low';
   urgencyLevel: 'worth-deeper-review' | 'worth-considering' | 'worth-noting';
   priorityScore: number;
 }
 
-// PRIMARY TRIGGERS - Hard requirements. If ANY fails, strategy NEVER appears.
+// PRIMARY TRIGGERS - Hard requirements. ALL must pass for strategy to appear.
 export interface PrimaryTriggers {
   minAge?: number;
   maxAge?: number;
   maritalStatus?: MaritalStatus[];
+  employmentStatus?: EmploymentStatus[];
+  
+  // Account type requirements
+  requiresPreTaxRetirement?: boolean;
+  requiresTraditionalIRA?: boolean;
+  requires401k?: boolean;
+  requiresTaxableBrokerage?: boolean;
+  requiresMultipleAccountTypes?: boolean;
+  
   // Behavioral/situational triggers
-  requiresPreTaxRetirement?: boolean; // Has meaningful pre-tax accounts
-  requiresCharitableIntent?: boolean; // charitableGiving > 'none'
+  requiresCharitableIntent?: boolean;
   requiresEmployerStock?: boolean;
   requiresRentalRealEstate?: boolean;
   requiresBusinessOwnership?: boolean;
   requiresTransitionYear?: boolean;
   requiresLowerIncome?: boolean;
-  employmentStatus?: EmploymentStatus[];
-  // Additional explicit triggers
+  requiresIncomeVolatility?: boolean;
+  
+  // Roth-related
   requiresIncomeAboveRothLimits?: boolean;
   requiresNoLargePreTaxIRA?: boolean;
   requiresEmployer401kAfterTax?: boolean;
+  requiresMax401kContributions?: boolean;
+  
+  // Employment/separation
   requiresSeparatedFromService?: boolean;
+  requiresExecutiveCompensation?: boolean;
+  
+  // Education & family
   requires529Account?: boolean;
+  requiresEducationFundingIntent?: boolean;
+  requiresFamilyWealthTransfer?: boolean;
+  requiresMultiGenerationalPlanning?: boolean;
+  
+  // Real estate specific
+  requiresIntendsToSellProperty?: boolean;
+  requiresSellingPrimaryResidence?: boolean;
+  requiresDepreciatedRealEstate?: boolean;
+  requiresLargeLandParcel?: boolean;
+  requiresActiveParticipation?: boolean;
+  
+  // Investment/business
+  requiresHighlyAppreciatedAssets?: boolean;
+  requiresEmbeddedCapitalGains?: boolean;
+  requiresRealizedCapitalGains?: boolean;
+  requiresCCorpStock?: boolean;
+  requiresQSBSHoldingPeriod?: boolean;
+  requiresSellingBusinessOrRealEstate?: boolean;
+  
+  // Income/tax context
+  requiresHighTaxBracket?: boolean;
+  requiresIncomeSpike?: boolean;
+  requiresHighIncomeYear?: boolean;
+  requiresIncomeSmoothingPreference?: boolean;
+  requiresExpectedHigherFutureTaxes?: boolean;
+  
+  // Healthcare
+  requiresHDHP?: boolean;
+  
+  // Planning preferences
+  requiresLongevityConcern?: boolean;
+  requiresIncomeReplacementNeed?: boolean;
+  requiresEstatePlanningConcern?: boolean;
+  requiresModerateRiskTolerance?: boolean;
+  requiresMarketVolatility?: boolean;
+  requiresTaxableFixedIncome?: boolean;
+  requiresHighNetWorth?: boolean;
 }
 
-// SUPPRESSION CONDITIONS - Strategy hidden if ANY condition is met
 export interface SuppressionConditions {
-  // Suppress if retirement accounts below these tiers
   suppressBelowRetirementTier?: RetirementRange;
-  // Suppress if real estate below these tiers
   suppressBelowRealEstateTier?: RealEstateRange;
-  // Suppress if no real estate
   suppressIfNoRealEstate?: boolean;
 }
 
-// PRIORITY MODIFIERS - Affect sorting/urgency, never eligibility
 export interface PriorityModifiers {
-  // Higher balances = higher priority (not a requirement)
   higherPriorityRetirementTiers?: RetirementRange[];
   higherPriorityRealEstateTiers?: RealEstateRange[];
-  // Boost priority for these age ranges
   priorityAgeRange?: { min: number; max: number };
-  // Base priority boost
   basePriorityBoost?: number;
-}
-
-// Legacy interface for backward compatibility during migration
-export interface StrategyConditions {
-  minAge?: number;
-  maxAge?: number;
-  maritalStatus?: MaritalStatus[];
-  retirementRanges?: RetirementRange[];
-  realEstateRanges?: RealEstateRange[];
-  employmentStatus?: EmploymentStatus[];
-  requiresTransitionYear?: boolean;
-  requiresLowerIncome?: boolean;
-  requiresCharitable?: boolean;
-  requiresEmployerStock?: boolean;
 }
