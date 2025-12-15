@@ -39,19 +39,19 @@ export function IntroStep({ onStart }: IntroStepProps) {
             </h2>
             <div className="space-y-3 text-foreground/80 text-sm leading-relaxed">
               <p>
-                Many financial advisory relationships are built around investment management, not multi-year tax planning. This isn't a shortcoming—it's how most engagements are structured.
+                Most financial advisory relationships are built around investment management, not coordinated, multi-year tax planning. That isn't a failure—it's how the industry is structured.
               </p>
               <p>
-                Coordinated tax analysis often requires collaboration between CPAs and financial advisors, and many professionals prefer to stay within their lane to avoid liability.
+                Effective tax planning often requires collaboration between financial advisors, CPAs, and sometimes attorneys. Many professionals intentionally stay within their defined roles to avoid overstepping or creating liability.
               </p>
               <p>
-                Timing windows—unemployment, early retirement, business sales—create opportunities that are easy to miss without a deliberate process.
+                As a result, important timing windows—such as unemployment, early retirement, business sales, or account transitions—can be easy to miss without a deliberate process in place.
               </p>
               <p>
-                This tool is designed to help identify what may be worth discussing with qualified professionals who can evaluate your specific situation.
+                This tool exists to help surface those moments and highlight which planning ideas may be worth discussing with qualified professionals who can evaluate your full situation.
               </p>
               <p className="text-muted-foreground italic pt-2 border-t border-border/50">
-                This tool doesn't provide tax advice—it helps you ask better questions at the right time.
+                This tool does not provide tax advice. It helps you ask better questions at the right time.
               </p>
             </div>
           </div>
@@ -59,24 +59,24 @@ export function IntroStep({ onStart }: IntroStepProps) {
           {/* What This Does / Doesn't Do */}
           <div className="grid sm:grid-cols-2 gap-6 mb-12 opacity-0 animate-fade-up animation-delay-200">
             <div className="bg-sage-light/30 rounded-xl p-6">
-              <h3 className="font-serif font-semibold text-lg mb-3 text-sage">What This Tool Does</h3>
+              <h2 className="font-serif font-semibold text-lg mb-3 text-sage">What This Tool Does</h2>
               <ul className="space-y-2 text-sm text-foreground/80">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-sage mt-2 shrink-0" />
-                  Identifies tax strategies that may be relevant based on your situation
+                  Identifies tax-planning concepts that may be relevant based on your situation
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-sage mt-2 shrink-0" />
-                  Shows how people in similar circumstances approach these decisions
+                  Shows how people in similar stages of life think about these decisions
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-sage mt-2 shrink-0" />
-                  Helps you prepare informed questions for professional conversations
+                  Helps you prepare more informed conversations with tax and financial professionals
                 </li>
               </ul>
             </div>
             <div className="bg-muted/50 rounded-xl p-6">
-              <h3 className="font-serif font-semibold text-lg mb-3 text-muted-foreground">What This Tool Doesn't Do</h3>
+              <h2 className="font-serif font-semibold text-lg mb-3 text-muted-foreground">What This Tool Doesn't Do</h2>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-warm-gray mt-2 shrink-0" />
@@ -84,18 +84,77 @@ export function IntroStep({ onStart }: IntroStepProps) {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-warm-gray mt-2 shrink-0" />
-                  Calculate specific dollar amounts or savings
+                  Calculate specific dollar outcomes or guaranteed savings
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-warm-gray mt-2 shrink-0" />
-                  Replace professional guidance for your specific circumstances
+                  Replace professional judgment or individualized planning
                 </li>
               </ul>
             </div>
           </div>
 
+          {/* The Biggest Opportunity Section */}
+          <div className="bg-card/60 rounded-2xl p-8 mb-12 opacity-0 animate-fade-up animation-delay-250">
+            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-foreground mb-6 text-center">
+              The Biggest Opportunity Many Retirement Plans Miss
+            </h2>
+            
+            <div className="space-y-4 text-foreground/80 leading-relaxed">
+              <p>
+                Long-term financial outcomes are often influenced more by <span className="text-sage font-medium">reducing avoidable lifetime taxes</span> than by trying to earn higher investment returns.
+              </p>
+              
+              <p>
+                Taxes compound quietly over decades—through income changes, account growth, and required distributions. Small inefficiencies early on can turn into meaningful drags over a 20- or 30-year retirement.
+              </p>
+              
+              <p>
+                Because tax planning sits between disciplines, it often receives less attention than it deserves. This tool is designed to bring those considerations forward—before timing removes the opportunity.
+              </p>
+              
+              <blockquote className="border-l-4 border-sage pl-4 py-2 mt-6 italic text-sage">
+                The goal isn't to do everything. It's to recognize which opportunities exist while they're still available.
+              </blockquote>
+            </div>
+          </div>
+
+          {/* How It Works */}
+          <h2 className="font-serif text-2xl font-semibold text-foreground mb-6 text-center opacity-0 animate-fade-up animation-delay-300">
+            How It Works
+          </h2>
+          <div className="grid sm:grid-cols-3 gap-6 text-left mb-12 opacity-0 animate-fade-up animation-delay-300">
+            <div className="p-4 rounded-xl bg-card/50">
+              <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center mb-3">
+                <span className="text-sage font-serif font-bold">1</span>
+              </div>
+              <h3 className="font-medium mb-1">1. Share Your Situation</h3>
+              <p className="text-sm text-muted-foreground">
+                Answer a few simple questions about your stage of life and what you own. Takes about two minutes.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-card/50">
+              <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center mb-3">
+                <span className="text-sage font-serif font-bold">2</span>
+              </div>
+              <h3 className="font-medium mb-1">2. See Similar Stories</h3>
+              <p className="text-sm text-muted-foreground">
+                View examples of how people in comparable situations think about these decisions.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-card/50">
+              <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center mb-3">
+                <span className="text-sage font-serif font-bold">3</span>
+              </div>
+              <h3 className="font-medium mb-1">3. Explore Opportunities</h3>
+              <p className="text-sm text-muted-foreground">
+                Identify strategies that may be worth discussing with a qualified professional.
+              </p>
+            </div>
+          </div>
+
           {/* CTA */}
-          <div className="text-center mb-12 opacity-0 animate-fade-up animation-delay-250">
+          <div className="text-center mb-12 opacity-0 animate-fade-up animation-delay-350">
             <Button 
               variant="sage" 
               size="xl" 
@@ -109,75 +168,14 @@ export function IntroStep({ onStart }: IntroStepProps) {
               Takes about 2 minutes
             </p>
           </div>
-
-          {/* The Biggest Opportunity Section */}
-          <div className="bg-card/60 rounded-2xl p-8 mb-12 opacity-0 animate-fade-up animation-delay-300">
-            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-foreground mb-6 text-center">
-              The Biggest Opportunity Most Retirement Plans Miss
-            </h2>
-            
-            <div className="space-y-4 text-foreground/80 leading-relaxed">
-              <p>
-                Improving long-term financial outcomes is often driven more by <span className="text-sage font-medium">reducing avoidable lifetime taxes</span> than by earning higher investment returns. Yet this lever rarely gets the attention it deserves.
-              </p>
-              
-              <p>
-                Taxes quietly compound across decades — through income changes, account growth, and required distributions. Small inefficiencies early on can become significant drains over a 20 or 30-year retirement.
-              </p>
-              
-              <p>
-                Most financial advisors focus on accumulation and portfolio management, not coordinated multi-year tax analysis. This isn't neglect — it's how the industry is structured and incentivized. Tax planning often falls between the cracks.
-              </p>
-              
-              <div className="bg-sage-light/30 rounded-xl p-4 mt-6">
-                <p className="text-sm text-muted-foreground">
-                  <strong className="text-foreground">Important:</strong> This tool does not provide tax, legal, or investment advice. It helps identify which tax strategies may be worth discussing with qualified professionals who can evaluate your specific situation.
-                </p>
-              </div>
-              
-              <p className="text-center font-serif text-lg text-sage mt-6 italic">
-                "The goal isn't to do everything — it's to recognize which opportunities exist before timing removes them."
-              </p>
-            </div>
-          </div>
-
-          {/* How It Works */}
-          <div className="grid sm:grid-cols-3 gap-6 text-left opacity-0 animate-fade-up animation-delay-300">
-            <div className="p-4 rounded-xl bg-card/50">
-              <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center mb-3">
-                <span className="text-sage font-serif font-bold">1</span>
-              </div>
-              <h3 className="font-medium mb-1">Share Your Situation</h3>
-              <p className="text-sm text-muted-foreground">
-                Simple questions about your stage of life
-              </p>
-            </div>
-            <div className="p-4 rounded-xl bg-card/50">
-              <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center mb-3">
-                <span className="text-sage font-serif font-bold">2</span>
-              </div>
-              <h3 className="font-medium mb-1">See Similar Stories</h3>
-              <p className="text-sm text-muted-foreground">
-                Learn how others approach these decisions
-              </p>
-            </div>
-            <div className="p-4 rounded-xl bg-card/50">
-              <div className="w-10 h-10 rounded-lg bg-sage-light flex items-center justify-center mb-3">
-                <span className="text-sage font-serif font-bold">3</span>
-              </div>
-              <h3 className="font-medium mb-1">Explore Opportunities</h3>
-              <p className="text-sm text-muted-foreground">
-                Discover strategies worth discussing with a professional
-              </p>
-            </div>
-          </div>
         </div>
       </main>
 
       <footer className="container mx-auto px-4 py-6">
+        <p className="text-xs text-muted-foreground font-medium mb-1 text-center">Important Notice</p>
         <p className="text-xs text-center text-muted-foreground max-w-2xl mx-auto">
           This tool provides educational information only. It does not constitute tax, legal, 
-          or investment advice. Consult a qualified professional before making financial decisions.
+          or investment advice. Always consult a qualified professional before making financial decisions.
         </p>
       </footer>
     </div>
