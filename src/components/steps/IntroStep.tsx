@@ -31,24 +31,64 @@ export function IntroStep({ onStart }: IntroStepProps) {
               opportunities might be relevant to your situation.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 opacity-0 animate-fade-up animation-delay-200">
-              <Button 
-                variant="sage" 
-                size="xl" 
-                onClick={onStart}
-                className="group"
-              >
-                Get Started
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-              <p className="text-sm text-muted-foreground">
-                Takes about 2 minutes
-              </p>
+          </div>
+
+          {/* What This Does / Doesn't Do */}
+          <div className="grid sm:grid-cols-2 gap-6 mb-12 opacity-0 animate-fade-up animation-delay-200">
+            <div className="bg-sage-light/30 rounded-xl p-6">
+              <h3 className="font-serif font-semibold text-lg mb-3 text-sage">What This Tool Does</h3>
+              <ul className="space-y-2 text-sm text-foreground/80">
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sage mt-2 shrink-0" />
+                  Identifies tax strategies that may be relevant based on your situation
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sage mt-2 shrink-0" />
+                  Shows how people in similar circumstances approach these decisions
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sage mt-2 shrink-0" />
+                  Helps you prepare informed questions for professional conversations
+                </li>
+              </ul>
+            </div>
+            <div className="bg-muted/50 rounded-xl p-6">
+              <h3 className="font-serif font-semibold text-lg mb-3 text-muted-foreground">What This Tool Doesn't Do</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-warm-gray mt-2 shrink-0" />
+                  Provide tax, legal, or investment advice
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-warm-gray mt-2 shrink-0" />
+                  Calculate specific dollar amounts or savings
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-warm-gray mt-2 shrink-0" />
+                  Replace professional guidance for your specific circumstances
+                </li>
+              </ul>
             </div>
           </div>
 
+          {/* CTA */}
+          <div className="text-center mb-12 opacity-0 animate-fade-up animation-delay-250">
+            <Button 
+              variant="sage" 
+              size="xl" 
+              onClick={onStart}
+              className="group"
+            >
+              Start with a Few Simple Questions
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </Button>
+            <p className="text-sm text-muted-foreground mt-3">
+              Takes about 2 minutes
+            </p>
+          </div>
+
           {/* The Biggest Opportunity Section */}
-          <div className="bg-card/60 rounded-2xl p-8 mb-12 opacity-0 animate-fade-up animation-delay-250">
+          <div className="bg-card/60 rounded-2xl p-8 mb-12 opacity-0 animate-fade-up animation-delay-300">
             <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-foreground mb-6 text-center">
               The Biggest Opportunity Most Retirement Plans Miss
             </h2>

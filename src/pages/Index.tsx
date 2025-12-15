@@ -14,7 +14,8 @@ import {
   EmploymentStatus, 
   PersonaStory, 
   Strategy,
-  UnemploymentDetails
+  UnemploymentDetails,
+  CharitableRange
 } from "@/types/persona";
 
 type Step = 'intro' | 'persona' | 'stories' | 'household' | 'results';
@@ -59,6 +60,10 @@ export default function Index() {
     unemploymentDetails?: UnemploymentDetails;
     spouseEmploymentStatus?: EmploymentStatus;
     spouseUnemploymentDetails?: UnemploymentDetails;
+    charitableGiving?: CharitableRange;
+    hasBusinessOwnership?: boolean;
+    hasEmployerStock?: boolean;
+    hasRentalRealEstate?: boolean;
   }) => {
     const fullProfile: UserProfile = {
       firstName: profile.firstName!,
@@ -70,6 +75,10 @@ export default function Index() {
       unemploymentDetails: data.unemploymentDetails,
       spouseEmploymentStatus: data.spouseEmploymentStatus,
       spouseUnemploymentDetails: data.spouseUnemploymentDetails,
+      charitableGiving: data.charitableGiving,
+      hasBusinessOwnership: data.hasBusinessOwnership,
+      hasEmployerStock: data.hasEmployerStock,
+      hasRentalRealEstate: data.hasRentalRealEstate,
     };
     
     setProfile(fullProfile);
