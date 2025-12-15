@@ -1,6 +1,6 @@
 import { MatchedStrategy } from "@/types/persona";
 import { cn } from "@/lib/utils";
-import { TrendingUp, Minus, TrendingDown, Clock } from "lucide-react";
+import { TrendingUp, Minus, TrendingDown, Clock, User } from "lucide-react";
 
 interface StrategyCardProps {
   strategy: MatchedStrategy;
@@ -48,8 +48,17 @@ const urgencyLabels: Record<string, { label: string; className: string }> = {
   }
 };
 
+const evaluatorLabels: Record<string, string> = {
+  'CPA': 'CPA',
+  'CFP': 'CFP',
+  'Attorney': 'Attorney',
+  'CPA/CFP': 'CPA or CFP',
+  'CPA/Attorney': 'CPA or Attorney',
+  'CFP/Attorney': 'CFP or Attorney',
+  'CPA/CFP/Attorney': 'CPA, CFP, or Attorney'
+};
+
 export function StrategyCard({ strategy, index }: StrategyCardProps) {
-  // Use computedImpact for display
   const impact = impactConfig[strategy.computedImpact];
   const Icon = impact.icon;
   const isTimingSensitive = strategy.category === 'timing' || (strategy.transitionYearPriority && strategy.transitionYearPriority > 50);
@@ -63,7 +72,7 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
       )}
       style={{ animationDelay: `${(index + 1) * 100}ms` }}
     >
-      {/* Why This Appears - FIRST */}
+      {/* Why This Appears */}
       <div className="mb-4 pb-4 border-b border-border/50">
         <p className="text-sm font-medium text-sage mb-1">
           Why this appears for you
@@ -71,6 +80,14 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
         <p className="text-sm text-muted-foreground leading-relaxed">
           {strategy.whyForYou}
         </p>
+        
+        {/* Condition Triggered */}
+        <div className="mt-3 p-2 rounded-lg bg-muted/30">
+          <p className="text-xs text-muted-foreground">
+            <span className="font-medium">Condition met:</span> {strategy.triggerReason}
+          </p>
+        </div>
+        
         {/* Urgency level indicator */}
         <p className={cn("text-xs mt-2", urgency.className)}>
           {urgency.label}
@@ -109,10 +126,19 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
         {strategy.description}
       </p>
 
-      {/* Professional Coordination Footer */}
-      <p className="text-xs text-muted-foreground/70 italic pt-3 border-t border-border/30">
-        Professional coordination required
-      </p>
+      {/* Evaluator & Coordination Footer */}
+      <div className="pt-3 border-t border-border/30 space-y-2">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <User className="w-3 h-3" />
+          <span>
+            <span className="font-medium">Who should evaluate:</span>{' '}
+            {evaluatorLabels[strategy.evaluator] || strategy.evaluator}
+          </span>
+        </div>
+        <p className="text-xs text-muted-foreground/70 italic">
+          Professional coordination required. This is not tax advice.
+        </p>
+      </div>
     </div>
   );
 }
