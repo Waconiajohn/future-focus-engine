@@ -115,6 +115,12 @@ export type Evaluator = 'CPA' | 'CFP' | 'Attorney' | 'CPA/CFP' | 'CPA/Attorney' 
 export interface Strategy {
   id: string;
   title: string;
+  // CPA-friendly card content
+  whatThisIs: string; // Concise, neutral definition
+  whyItAppears: string; // Which inputs triggered visibility
+  whyOftenExplored: string; // High-level rationale (no promises)
+  evaluator: Evaluator; // Who typically evaluates this
+  // Legacy fields for backward compatibility
   description: string;
   whyForYou: string;
   impact: 'high' | 'medium' | 'low';
@@ -130,8 +136,7 @@ export interface Strategy {
   // Complexity flag for suppression at lower tiers
   complexity?: 'high' | 'medium' | 'low';
   // Display metadata
-  triggerReason: string; // What condition triggered visibility
-  evaluator: Evaluator; // Who should evaluate this strategy
+  triggerReason: string;
 }
 
 // Matched strategy with computed values
