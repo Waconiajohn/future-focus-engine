@@ -159,15 +159,15 @@ export function ResultsStep({ profile, strategies, onRestart }: ResultsStepProps
           {/* CTA Section */}
           <div className="bg-sage-light/50 rounded-2xl p-8 text-center opacity-0 animate-fade-up animation-delay-500">
             <h3 className="font-serif text-xl font-semibold mb-4">
-              Ready to Take the Next Step?
+              Want help mapping these ideas to your real numbers?
             </h3>
             <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-              These strategies are educational starting points. A qualified tax professional 
-              can help evaluate which approaches make sense for your specific situation
-              {flags.isTransitionYear && " — especially given your current transition"}. 
+              These strategies are educational starting points — not recommendations. 
+              A qualified professional can help evaluate which approaches fit your specific situation
+              {flags.isTransitionYear && ", especially during this transition window"}.
             </p>
             <Button variant="sage-outline" size="lg">
-              Find a Tax Professional
+              Schedule a Conversation
             </Button>
           </div>
 
