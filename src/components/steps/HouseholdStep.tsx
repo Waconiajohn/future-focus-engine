@@ -2,8 +2,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
-import { ArrowRight, ArrowLeft } from "lucide-react";
-import { EmploymentStatus, MaritalStatus, UnemploymentDetails, UnemploymentDuration, CharitableRange } from "@/types/persona";
+import { ArrowRight, ArrowLeft, AlertCircle } from "lucide-react";
+import { 
+  EmploymentStatus, 
+  MaritalStatus, 
+  UnemploymentDetails, 
+  UnemploymentDuration, 
+  CharitableRange,
+  SeveranceRange,
+  SeveranceType,
+  UIRange,
+  CurrentYearIncomeComparison,
+  SelfEmployedDetails
+} from "@/types/persona";
 import { cn } from "@/lib/utils";
 
 interface HouseholdStepProps {
@@ -11,8 +22,10 @@ interface HouseholdStepProps {
   onComplete: (data: {
     employmentStatus: EmploymentStatus;
     unemploymentDetails?: UnemploymentDetails;
+    selfEmployedDetails?: SelfEmployedDetails;
     spouseEmploymentStatus?: EmploymentStatus;
     spouseUnemploymentDetails?: UnemploymentDetails;
+    spouseSelfEmployedDetails?: SelfEmployedDetails;
     charitableGiving?: CharitableRange;
     hasBusinessOwnership?: boolean;
     hasEmployerStock?: boolean;
@@ -22,8 +35,10 @@ interface HouseholdStepProps {
 }
 
 const employmentOptions: { value: EmploymentStatus; label: string; description: string }[] = [
-  { value: 'employed', label: 'Employed', description: 'Currently working' },
+  { value: 'employed', label: 'Employed', description: 'Currently working as W-2 employee' },
   { value: 'unemployed', label: 'In Transition', description: 'Between jobs, on sabbatical, or career change' },
+  { value: 'self-employed', label: 'Self-Employed', description: 'Own business or independent contractor' },
+  { value: 'consulting', label: 'Consulting', description: 'Independent consulting or contract work' },
   { value: 'retired', label: 'Retired', description: 'No longer working for income' },
 ];
 
@@ -40,6 +55,33 @@ const returnOptions: { value: 'yes' | 'no' | 'not-sure'; label: string; descript
   { value: 'not-sure', label: 'Not sure yet', description: 'Still evaluating options' },
 ];
 
+const severanceRangeOptions: { value: SeveranceRange; label: string }[] = [
+  { value: 'none', label: 'None' },
+  { value: '<50k', label: 'Less than $50,000' },
+  { value: '50k-150k', label: '$50,000 – $150,000' },
+  { value: '150k-300k', label: '$150,000 – $300,000' },
+  { value: '>300k', label: 'More than $300,000' },
+];
+
+const severanceTypeOptions: { value: SeveranceType; label: string; description: string }[] = [
+  { value: 'lump-sum', label: 'Lump sum', description: 'Paid all at once' },
+  { value: 'over-time', label: 'Over time', description: 'Spread across multiple payments' },
+];
+
+const uiRangeOptions: { value: UIRange; label: string }[] = [
+  { value: 'none', label: 'Not receiving UI' },
+  { value: '<2k', label: 'Less than $2,000/month' },
+  { value: '2k-4k', label: '$2,000 – $4,000/month' },
+  { value: '>4k', label: 'More than $4,000/month' },
+];
+
+const incomeComparisonOptions: { value: CurrentYearIncomeComparison; label: string; description: string }[] = [
+  { value: 'higher', label: 'Higher than typical', description: 'Due to severance, bonuses, or other factors' },
+  { value: 'similar', label: 'About the same', description: 'Similar to a typical working year' },
+  { value: 'lower', label: 'Lower than typical', description: 'Noticeably reduced income' },
+  { value: 'unsure', label: 'Not sure', description: 'Haven\'t fully assessed yet' },
+];
+
 const charitableOptions: { value: CharitableRange; label: string }[] = [
   { value: 'none', label: 'None or minimal' },
   { value: '<5k', label: 'Less than $5,000/year' },
@@ -51,12 +93,24 @@ const charitableOptions: { value: CharitableRange; label: string }[] = [
 type Step = 
   | 'primary-employment'
   | 'primary-duration'
-  | 'primary-income-lower'
+  | 'primary-severance'
+  | 'primary-severance-amount'
+  | 'primary-severance-type'
+  | 'primary-ui'
+  | 'primary-income-comparison'
   | 'primary-return'
+  | 'primary-self-employed-fluctuates'
+  | 'primary-self-employed-cashflow'
   | 'spouse-employment'
   | 'spouse-duration'
-  | 'spouse-income-lower'
+  | 'spouse-severance'
+  | 'spouse-severance-amount'
+  | 'spouse-severance-type'
+  | 'spouse-ui'
+  | 'spouse-income-comparison'
   | 'spouse-return'
+  | 'spouse-self-employed-fluctuates'
+  | 'spouse-self-employed-cashflow'
   | 'charitable-giving'
   | 'business-ownership'
   | 'employer-stock'
@@ -71,11 +125,35 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
   const [primaryIncomeLower, setPrimaryIncomeLower] = useState<boolean | null>(null);
   const [primaryExpectReturn, setPrimaryExpectReturn] = useState<'yes' | 'no' | 'not-sure' | "">("");
   
+  // Primary unemployment details
+  const [primaryReceivedSeverance, setPrimaryReceivedSeverance] = useState<boolean | null>(null);
+  const [primarySeveranceRange, setPrimarySeveranceRange] = useState<SeveranceRange | "">("");
+  const [primarySeveranceType, setPrimarySeveranceType] = useState<SeveranceType | "">("");
+  const [primaryReceivingUI, setPrimaryReceivingUI] = useState<boolean | null>(null);
+  const [primaryUIRange, setPrimaryUIRange] = useState<UIRange | "">("");
+  const [primaryIncomeComparison, setPrimaryIncomeComparison] = useState<CurrentYearIncomeComparison | "">("");
+
+  // Primary self-employed details
+  const [primaryIncomeFluctuates, setPrimaryIncomeFluctuates] = useState<boolean | null>(null);
+  const [primaryPositiveCashFlow, setPrimaryPositiveCashFlow] = useState<boolean | null>(null);
+  
   // Spouse state
   const [spouseEmploymentStatus, setSpouseEmploymentStatus] = useState<EmploymentStatus | "">("");
   const [spouseDuration, setSpouseDuration] = useState<UnemploymentDuration | "">("");
   const [spouseIncomeLower, setSpouseIncomeLower] = useState<boolean | null>(null);
   const [spouseExpectReturn, setSpouseExpectReturn] = useState<'yes' | 'no' | 'not-sure' | "">("");
+
+  // Spouse unemployment details
+  const [spouseReceivedSeverance, setSpouseReceivedSeverance] = useState<boolean | null>(null);
+  const [spouseSeveranceRange, setSpouseSeveranceRange] = useState<SeveranceRange | "">("");
+  const [spouseSeveranceType, setSpouseSeveranceType] = useState<SeveranceType | "">("");
+  const [spouseReceivingUI, setSpouseReceivingUI] = useState<boolean | null>(null);
+  const [spouseUIRange, setSpouseUIRange] = useState<UIRange | "">("");
+  const [spouseIncomeComparison, setSpouseIncomeComparison] = useState<CurrentYearIncomeComparison | "">("");
+
+  // Spouse self-employed details
+  const [spouseIncomeFluctuates, setSpouseIncomeFluctuates] = useState<boolean | null>(null);
+  const [spousePositiveCashFlow, setSpousePositiveCashFlow] = useState<boolean | null>(null);
 
   // Life context state
   const [charitableGiving, setCharitableGiving] = useState<CharitableRange | "">("");
@@ -87,13 +165,32 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
     const flow: Step[] = ['primary-employment'];
     
     if (employmentStatus === 'unemployed') {
-      flow.push('primary-duration', 'primary-income-lower', 'primary-return');
+      flow.push('primary-duration', 'primary-severance');
+      if (primaryReceivedSeverance === true) {
+        flow.push('primary-severance-amount', 'primary-severance-type');
+      }
+      flow.push('primary-ui');
+      flow.push('primary-income-comparison');
+      flow.push('primary-return');
+    }
+
+    if (employmentStatus === 'self-employed' || employmentStatus === 'consulting') {
+      flow.push('primary-self-employed-fluctuates', 'primary-self-employed-cashflow');
     }
     
     if (maritalStatus === 'married') {
       flow.push('spouse-employment');
       if (spouseEmploymentStatus === 'unemployed') {
-        flow.push('spouse-duration', 'spouse-income-lower', 'spouse-return');
+        flow.push('spouse-duration', 'spouse-severance');
+        if (spouseReceivedSeverance === true) {
+          flow.push('spouse-severance-amount', 'spouse-severance-type');
+        }
+        flow.push('spouse-ui');
+        flow.push('spouse-income-comparison');
+        flow.push('spouse-return');
+      }
+      if (spouseEmploymentStatus === 'self-employed' || spouseEmploymentStatus === 'consulting') {
+        flow.push('spouse-self-employed-fluctuates', 'spouse-self-employed-cashflow');
       }
     }
 
@@ -118,29 +215,63 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
   };
 
   const handleComplete = () => {
+    // Compute incomeLowerThanTypical from incomeComparison
+    const primaryLowerIncome = primaryIncomeComparison === 'lower';
+    const spouseLowerIncome = spouseIncomeComparison === 'lower';
+
     const primaryDetails: UnemploymentDetails | undefined = 
-      employmentStatus === 'unemployed' && primaryDuration && primaryIncomeLower !== null && primaryExpectReturn
+      employmentStatus === 'unemployed' && primaryDuration && primaryIncomeComparison
         ? {
             duration: primaryDuration as UnemploymentDuration,
-            incomeLowerThanTypical: primaryIncomeLower,
-            expectReturnWithin12Months: primaryExpectReturn as 'yes' | 'no' | 'not-sure'
+            incomeLowerThanTypical: primaryLowerIncome,
+            expectReturnWithin12Months: primaryExpectReturn as 'yes' | 'no' | 'not-sure',
+            receivedSeverance: primaryReceivedSeverance ?? undefined,
+            severanceRange: primarySeveranceRange as SeveranceRange || undefined,
+            severanceType: primarySeveranceType as SeveranceType || undefined,
+            receivingUI: primaryReceivingUI ?? undefined,
+            uiRange: primaryUIRange as UIRange || undefined,
+            currentYearIncomeComparison: primaryIncomeComparison as CurrentYearIncomeComparison,
           }
         : undefined;
 
     const spouseDetails: UnemploymentDetails | undefined = 
-      spouseEmploymentStatus === 'unemployed' && spouseDuration && spouseIncomeLower !== null && spouseExpectReturn
+      spouseEmploymentStatus === 'unemployed' && spouseDuration && spouseIncomeComparison
         ? {
             duration: spouseDuration as UnemploymentDuration,
-            incomeLowerThanTypical: spouseIncomeLower,
-            expectReturnWithin12Months: spouseExpectReturn as 'yes' | 'no' | 'not-sure'
+            incomeLowerThanTypical: spouseLowerIncome,
+            expectReturnWithin12Months: spouseExpectReturn as 'yes' | 'no' | 'not-sure',
+            receivedSeverance: spouseReceivedSeverance ?? undefined,
+            severanceRange: spouseSeveranceRange as SeveranceRange || undefined,
+            severanceType: spouseSeveranceType as SeveranceType || undefined,
+            receivingUI: spouseReceivingUI ?? undefined,
+            uiRange: spouseUIRange as UIRange || undefined,
+            currentYearIncomeComparison: spouseIncomeComparison as CurrentYearIncomeComparison,
+          }
+        : undefined;
+
+    const primarySelfEmployedDetails: SelfEmployedDetails | undefined =
+      (employmentStatus === 'self-employed' || employmentStatus === 'consulting')
+        ? {
+            incomeFluctuatesQuarterly: primaryIncomeFluctuates ?? undefined,
+            hasPositiveCashFlow: primaryPositiveCashFlow ?? undefined,
+          }
+        : undefined;
+
+    const spouseSelfEmployedDetails: SelfEmployedDetails | undefined =
+      (spouseEmploymentStatus === 'self-employed' || spouseEmploymentStatus === 'consulting')
+        ? {
+            incomeFluctuatesQuarterly: spouseIncomeFluctuates ?? undefined,
+            hasPositiveCashFlow: spousePositiveCashFlow ?? undefined,
           }
         : undefined;
 
     onComplete({
       employmentStatus: employmentStatus as EmploymentStatus,
       unemploymentDetails: primaryDetails,
+      selfEmployedDetails: primarySelfEmployedDetails,
       spouseEmploymentStatus: maritalStatus === 'married' ? spouseEmploymentStatus as EmploymentStatus : undefined,
       spouseUnemploymentDetails: spouseDetails,
+      spouseSelfEmployedDetails: spouseSelfEmployedDetails,
       charitableGiving: charitableGiving as CharitableRange || undefined,
       hasBusinessOwnership: hasBusinessOwnership ?? undefined,
       hasEmployerStock: hasEmployerStock ?? undefined,
@@ -167,12 +298,24 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
     switch (currentStep) {
       case 'primary-employment': return employmentStatus !== "";
       case 'primary-duration': return primaryDuration !== "";
-      case 'primary-income-lower': return primaryIncomeLower !== null;
+      case 'primary-severance': return primaryReceivedSeverance !== null;
+      case 'primary-severance-amount': return primarySeveranceRange !== "";
+      case 'primary-severance-type': return primarySeveranceType !== "";
+      case 'primary-ui': return primaryReceivingUI !== null;
+      case 'primary-income-comparison': return primaryIncomeComparison !== "";
       case 'primary-return': return primaryExpectReturn !== "";
+      case 'primary-self-employed-fluctuates': return primaryIncomeFluctuates !== null;
+      case 'primary-self-employed-cashflow': return primaryPositiveCashFlow !== null;
       case 'spouse-employment': return spouseEmploymentStatus !== "";
       case 'spouse-duration': return spouseDuration !== "";
-      case 'spouse-income-lower': return spouseIncomeLower !== null;
+      case 'spouse-severance': return spouseReceivedSeverance !== null;
+      case 'spouse-severance-amount': return spouseSeveranceRange !== "";
+      case 'spouse-severance-type': return spouseSeveranceType !== "";
+      case 'spouse-ui': return spouseReceivingUI !== null;
+      case 'spouse-income-comparison': return spouseIncomeComparison !== "";
       case 'spouse-return': return spouseExpectReturn !== "";
+      case 'spouse-self-employed-fluctuates': return spouseIncomeFluctuates !== null;
+      case 'spouse-self-employed-cashflow': return spousePositiveCashFlow !== null;
       case 'charitable-giving': return charitableGiving !== "";
       case 'business-ownership': return hasBusinessOwnership !== null;
       case 'employer-stock': return hasEmployerStock !== null;
@@ -180,6 +323,13 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
       default: return false;
     }
   };
+
+  // Helper to determine if we should show caution microcopy
+  const showHighIncomeWarning = (incomeComparison: CurrentYearIncomeComparison | "", severance: boolean | null) => {
+    return (incomeComparison === 'higher' || incomeComparison === 'similar') && severance === true;
+  };
+
+  const showUIWarning = (receivingUI: boolean | null) => receivingUI === true;
 
   const renderStep = () => {
     switch (currentStep) {
@@ -252,53 +402,219 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
           </div>
         );
 
-      case 'primary-income-lower':
+      case 'primary-severance':
         return (
           <div className="opacity-0 animate-fade-up">
             <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
-              Is your income this year significantly lower than a typical working year?
+              Have you received severance in the last 12 months?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Lower-income years can create unique planning opportunities
+              Severance payments can significantly affect your tax situation
             </p>
             <RadioGroup
-              value={primaryIncomeLower === null ? "" : primaryIncomeLower ? "yes" : "no"}
-              onValueChange={(value) => setPrimaryIncomeLower(value === "yes")}
+              value={primaryReceivedSeverance === null ? "" : primaryReceivedSeverance ? "yes" : "no"}
+              onValueChange={(value) => setPrimaryReceivedSeverance(value === "yes")}
               className="space-y-3"
             >
               <label
                 className={cn(
-                  "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
-                  primaryIncomeLower === true
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  primaryReceivedSeverance === true
                     ? "border-sage bg-sage-light/50"
                     : "border-border hover:border-sage/50"
                 )}
               >
-                <div className="flex items-center gap-4">
-                  <RadioGroupItem value="yes" id="income-lower-yes" />
-                  <span className="font-medium">Yes, noticeably lower</span>
-                </div>
-                <span className="text-sm text-muted-foreground ml-8">
-                  Income is significantly below what I'd typically earn
-                </span>
+                <RadioGroupItem value="yes" id="severance-yes" />
+                <span className="font-medium">Yes</span>
               </label>
               <label
                 className={cn(
-                  "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
-                  primaryIncomeLower === false
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  primaryReceivedSeverance === false
                     ? "border-sage bg-sage-light/50"
                     : "border-border hover:border-sage/50"
                 )}
               >
-                <div className="flex items-center gap-4">
-                  <RadioGroupItem value="no" id="income-lower-no" />
-                  <span className="font-medium">No, about the same</span>
-                </div>
-                <span className="text-sm text-muted-foreground ml-8">
-                  Severance, savings, or other income keeps it similar
-                </span>
+                <RadioGroupItem value="no" id="severance-no" />
+                <span className="font-medium">No</span>
               </label>
             </RadioGroup>
+          </div>
+        );
+
+      case 'primary-severance-amount':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Approximately how much severance did you receive?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              This helps assess your total income for the year
+            </p>
+            <RadioGroup
+              value={primarySeveranceRange}
+              onValueChange={(value) => setPrimarySeveranceRange(value as SeveranceRange)}
+              className="space-y-3"
+            >
+              {severanceRangeOptions.filter(o => o.value !== 'none').map((option) => (
+                <label
+                  key={option.value}
+                  className={cn(
+                    "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    primarySeveranceRange === option.value
+                      ? "border-sage bg-sage-light/50"
+                      : "border-border hover:border-sage/50"
+                  )}
+                >
+                  <RadioGroupItem value={option.value} id={`sev-amt-${option.value}`} />
+                  <span className="font-medium">{option.label}</span>
+                </label>
+              ))}
+            </RadioGroup>
+          </div>
+        );
+
+      case 'primary-severance-type':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              How is your severance being paid?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Timing of payments affects tax planning options
+            </p>
+            <RadioGroup
+              value={primarySeveranceType}
+              onValueChange={(value) => setPrimarySeveranceType(value as SeveranceType)}
+              className="space-y-3"
+            >
+              {severanceTypeOptions.map((option) => (
+                <label
+                  key={option.value}
+                  className={cn(
+                    "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    primarySeveranceType === option.value
+                      ? "border-sage bg-sage-light/50"
+                      : "border-border hover:border-sage/50"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <RadioGroupItem value={option.value} id={`sev-type-${option.value}`} />
+                    <span className="font-medium">{option.label}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground ml-8">
+                    {option.description}
+                  </span>
+                </label>
+              ))}
+            </RadioGroup>
+          </div>
+        );
+
+      case 'primary-ui':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Are you receiving unemployment insurance (UI)?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              UI benefits are taxable income
+            </p>
+            <RadioGroup
+              value={primaryReceivingUI === null ? "" : primaryReceivingUI ? "yes" : "no"}
+              onValueChange={(value) => {
+                setPrimaryReceivingUI(value === "yes");
+                if (value === "no") setPrimaryUIRange('none');
+              }}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  primaryReceivingUI === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="yes" id="ui-yes" />
+                <span className="font-medium">Yes</span>
+              </label>
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  primaryReceivingUI === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="no" id="ui-no" />
+                <span className="font-medium">No</span>
+              </label>
+            </RadioGroup>
+            {primaryReceivingUI === true && (
+              <div className="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground/80">
+                  Benefits and credits can be sensitive to income changes; confirm with a CPA.
+                </p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'primary-income-comparison':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              How does your current year income compare to a typical working year?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Consider all sources: severance, savings withdrawals, spouse income, etc.
+            </p>
+            <RadioGroup
+              value={primaryIncomeComparison}
+              onValueChange={(value) => {
+                setPrimaryIncomeComparison(value as CurrentYearIncomeComparison);
+                setPrimaryIncomeLower(value === 'lower');
+              }}
+              className="space-y-3"
+            >
+              {incomeComparisonOptions.map((option) => (
+                <label
+                  key={option.value}
+                  className={cn(
+                    "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    primaryIncomeComparison === option.value
+                      ? "border-sage bg-sage-light/50"
+                      : "border-border hover:border-sage/50"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <RadioGroupItem value={option.value} id={`income-${option.value}`} />
+                    <span className="font-medium">{option.label}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground ml-8">
+                    {option.description}
+                  </span>
+                </label>
+              ))}
+            </RadioGroup>
+            {showHighIncomeWarning(primaryIncomeComparison, primaryReceivedSeverance) && (
+              <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground/80">
+                  Unemployment can still be a high-income year if severance or other income is present. Some "low-income" strategies may not apply.
+                </p>
+              </div>
+            )}
+            {primaryIncomeComparison === 'lower' && (
+              <div className="mt-6 p-4 bg-sage-light/30 border border-sage/20 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-sage shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground/80">
+                  Lower-income years may create timing-based planning windows. Be mindful of credit and subsidy thresholds—review with a professional.
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -306,7 +622,7 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
         return (
           <div className="opacity-0 animate-fade-up">
             <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
-              Do you expect to return to similar income levels?
+              Do you expect to return to W-2 employment within 12 months?
             </h2>
             <p className="text-muted-foreground mb-8">
               This shapes which strategies may be most relevant
@@ -339,6 +655,107 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
           </div>
         );
 
+      case 'primary-self-employed-fluctuates':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Does your income fluctuate quarter-to-quarter?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Variable income affects tax planning strategies
+            </p>
+            <RadioGroup
+              value={primaryIncomeFluctuates === null ? "" : primaryIncomeFluctuates ? "yes" : "no"}
+              onValueChange={(value) => setPrimaryIncomeFluctuates(value === "yes")}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  primaryIncomeFluctuates === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <div className="flex items-center gap-4">
+                  <RadioGroupItem value="yes" id="fluctuates-yes" />
+                  <span className="font-medium">Yes, income varies significantly</span>
+                </div>
+                <span className="text-sm text-muted-foreground ml-8">
+                  Revenue depends on projects, clients, or seasons
+                </span>
+              </label>
+              <label
+                className={cn(
+                  "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  primaryIncomeFluctuates === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <div className="flex items-center gap-4">
+                  <RadioGroupItem value="no" id="fluctuates-no" />
+                  <span className="font-medium">No, fairly stable</span>
+                </div>
+                <span className="text-sm text-muted-foreground ml-8">
+                  Consistent income throughout the year
+                </span>
+              </label>
+            </RadioGroup>
+          </div>
+        );
+
+      case 'primary-self-employed-cashflow':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Do you currently have positive cash flow?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              This affects contribution strategies and timing
+            </p>
+            <RadioGroup
+              value={primaryPositiveCashFlow === null ? "" : primaryPositiveCashFlow ? "yes" : "no"}
+              onValueChange={(value) => setPrimaryPositiveCashFlow(value === "yes")}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  primaryPositiveCashFlow === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <div className="flex items-center gap-4">
+                  <RadioGroupItem value="yes" id="cashflow-yes" />
+                  <span className="font-medium">Yes</span>
+                </div>
+                <span className="text-sm text-muted-foreground ml-8">
+                  Business income exceeds expenses
+                </span>
+              </label>
+              <label
+                className={cn(
+                  "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  primaryPositiveCashFlow === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <div className="flex items-center gap-4">
+                  <RadioGroupItem value="no" id="cashflow-no" />
+                  <span className="font-medium">No / Not sure</span>
+                </div>
+                <span className="text-sm text-muted-foreground ml-8">
+                  Still building or variable
+                </span>
+              </label>
+            </RadioGroup>
+          </div>
+        );
+
+      // SPOUSE STEPS
       case 'spouse-employment':
         return (
           <div className="opacity-0 animate-fade-up">
@@ -408,47 +825,211 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
           </div>
         );
 
-      case 'spouse-income-lower':
+      case 'spouse-severance':
         return (
           <div className="opacity-0 animate-fade-up">
             <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
-              Is your spouse's income this year significantly lower than typical?
+              Has your spouse received severance in the last 12 months?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Household income changes affect planning options
+              Severance payments affect household tax situation
             </p>
             <RadioGroup
-              value={spouseIncomeLower === null ? "" : spouseIncomeLower ? "yes" : "no"}
-              onValueChange={(value) => setSpouseIncomeLower(value === "yes")}
+              value={spouseReceivedSeverance === null ? "" : spouseReceivedSeverance ? "yes" : "no"}
+              onValueChange={(value) => setSpouseReceivedSeverance(value === "yes")}
               className="space-y-3"
             >
               <label
                 className={cn(
-                  "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
-                  spouseIncomeLower === true
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  spouseReceivedSeverance === true
                     ? "border-sage bg-sage-light/50"
                     : "border-border hover:border-sage/50"
                 )}
               >
-                <div className="flex items-center gap-4">
-                  <RadioGroupItem value="yes" id="spouse-income-lower-yes" />
-                  <span className="font-medium">Yes, noticeably lower</span>
-                </div>
+                <RadioGroupItem value="yes" id="spouse-severance-yes" />
+                <span className="font-medium">Yes</span>
               </label>
               <label
                 className={cn(
-                  "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
-                  spouseIncomeLower === false
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  spouseReceivedSeverance === false
                     ? "border-sage bg-sage-light/50"
                     : "border-border hover:border-sage/50"
                 )}
               >
-                <div className="flex items-center gap-4">
-                  <RadioGroupItem value="no" id="spouse-income-lower-no" />
-                  <span className="font-medium">No, about the same</span>
-                </div>
+                <RadioGroupItem value="no" id="spouse-severance-no" />
+                <span className="font-medium">No</span>
               </label>
             </RadioGroup>
+          </div>
+        );
+
+      case 'spouse-severance-amount':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Approximately how much severance did your spouse receive?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              This helps assess household income for the year
+            </p>
+            <RadioGroup
+              value={spouseSeveranceRange}
+              onValueChange={(value) => setSpouseSeveranceRange(value as SeveranceRange)}
+              className="space-y-3"
+            >
+              {severanceRangeOptions.filter(o => o.value !== 'none').map((option) => (
+                <label
+                  key={option.value}
+                  className={cn(
+                    "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    spouseSeveranceRange === option.value
+                      ? "border-sage bg-sage-light/50"
+                      : "border-border hover:border-sage/50"
+                  )}
+                >
+                  <RadioGroupItem value={option.value} id={`spouse-sev-amt-${option.value}`} />
+                  <span className="font-medium">{option.label}</span>
+                </label>
+              ))}
+            </RadioGroup>
+          </div>
+        );
+
+      case 'spouse-severance-type':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              How is your spouse's severance being paid?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Timing of payments affects tax planning options
+            </p>
+            <RadioGroup
+              value={spouseSeveranceType}
+              onValueChange={(value) => setSpouseSeveranceType(value as SeveranceType)}
+              className="space-y-3"
+            >
+              {severanceTypeOptions.map((option) => (
+                <label
+                  key={option.value}
+                  className={cn(
+                    "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    spouseSeveranceType === option.value
+                      ? "border-sage bg-sage-light/50"
+                      : "border-border hover:border-sage/50"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <RadioGroupItem value={option.value} id={`spouse-sev-type-${option.value}`} />
+                    <span className="font-medium">{option.label}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground ml-8">
+                    {option.description}
+                  </span>
+                </label>
+              ))}
+            </RadioGroup>
+          </div>
+        );
+
+      case 'spouse-ui':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Is your spouse receiving unemployment insurance (UI)?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              UI benefits are taxable income
+            </p>
+            <RadioGroup
+              value={spouseReceivingUI === null ? "" : spouseReceivingUI ? "yes" : "no"}
+              onValueChange={(value) => {
+                setSpouseReceivingUI(value === "yes");
+                if (value === "no") setSpouseUIRange('none');
+              }}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  spouseReceivingUI === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="yes" id="spouse-ui-yes" />
+                <span className="font-medium">Yes</span>
+              </label>
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  spouseReceivingUI === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="no" id="spouse-ui-no" />
+                <span className="font-medium">No</span>
+              </label>
+            </RadioGroup>
+            {spouseReceivingUI === true && (
+              <div className="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground/80">
+                  Benefits and credits can be sensitive to income changes; confirm with a CPA.
+                </p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'spouse-income-comparison':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              How does your spouse's current year income compare to a typical year?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Consider all sources including severance
+            </p>
+            <RadioGroup
+              value={spouseIncomeComparison}
+              onValueChange={(value) => {
+                setSpouseIncomeComparison(value as CurrentYearIncomeComparison);
+                setSpouseIncomeLower(value === 'lower');
+              }}
+              className="space-y-3"
+            >
+              {incomeComparisonOptions.map((option) => (
+                <label
+                  key={option.value}
+                  className={cn(
+                    "flex flex-col gap-1 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                    spouseIncomeComparison === option.value
+                      ? "border-sage bg-sage-light/50"
+                      : "border-border hover:border-sage/50"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <RadioGroupItem value={option.value} id={`spouse-income-${option.value}`} />
+                    <span className="font-medium">{option.label}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground ml-8">
+                    {option.description}
+                  </span>
+                </label>
+              ))}
+            </RadioGroup>
+            {showHighIncomeWarning(spouseIncomeComparison, spouseReceivedSeverance) && (
+              <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground/80">
+                  Unemployment can still be a high-income year if severance or other income is present.
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -456,7 +1037,7 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
         return (
           <div className="opacity-0 animate-fade-up">
             <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
-              Does your spouse expect to return to similar income?
+              Does your spouse expect to return to W-2 employment within 12 months?
             </h2>
             <p className="text-muted-foreground mb-8">
               This shapes the planning horizon
@@ -489,6 +1070,87 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
           </div>
         );
 
+      case 'spouse-self-employed-fluctuates':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Does your spouse's income fluctuate quarter-to-quarter?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              Variable income affects tax planning strategies
+            </p>
+            <RadioGroup
+              value={spouseIncomeFluctuates === null ? "" : spouseIncomeFluctuates ? "yes" : "no"}
+              onValueChange={(value) => setSpouseIncomeFluctuates(value === "yes")}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  spouseIncomeFluctuates === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="yes" id="spouse-fluctuates-yes" />
+                <span className="font-medium">Yes, income varies significantly</span>
+              </label>
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  spouseIncomeFluctuates === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="no" id="spouse-fluctuates-no" />
+                <span className="font-medium">No, fairly stable</span>
+              </label>
+            </RadioGroup>
+          </div>
+        );
+
+      case 'spouse-self-employed-cashflow':
+        return (
+          <div className="opacity-0 animate-fade-up">
+            <h2 className="font-serif text-3xl font-semibold text-foreground mb-2">
+              Does your spouse currently have positive cash flow?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              This affects contribution strategies and timing
+            </p>
+            <RadioGroup
+              value={spousePositiveCashFlow === null ? "" : spousePositiveCashFlow ? "yes" : "no"}
+              onValueChange={(value) => setSpousePositiveCashFlow(value === "yes")}
+              className="space-y-3"
+            >
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  spousePositiveCashFlow === true
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="yes" id="spouse-cashflow-yes" />
+                <span className="font-medium">Yes</span>
+              </label>
+              <label
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                  spousePositiveCashFlow === false
+                    ? "border-sage bg-sage-light/50"
+                    : "border-border hover:border-sage/50"
+                )}
+              >
+                <RadioGroupItem value="no" id="spouse-cashflow-no" />
+                <span className="font-medium">No / Not sure</span>
+              </label>
+            </RadioGroup>
+          </div>
+        );
+
+      // LIFE CONTEXT STEPS
       case 'charitable-giving':
         return (
           <div className="opacity-0 animate-fade-up">

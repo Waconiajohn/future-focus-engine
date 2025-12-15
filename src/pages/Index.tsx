@@ -15,7 +15,8 @@ import {
   PersonaStory, 
   MatchedStrategy,
   UnemploymentDetails,
-  CharitableRange
+  CharitableRange,
+  SelfEmployedDetails
 } from "@/types/persona";
 
 type Step = 'intro' | 'persona' | 'stories' | 'household' | 'results';
@@ -58,8 +59,10 @@ export default function Index() {
   const handleHouseholdComplete = (data: {
     employmentStatus: EmploymentStatus;
     unemploymentDetails?: UnemploymentDetails;
+    selfEmployedDetails?: SelfEmployedDetails;
     spouseEmploymentStatus?: EmploymentStatus;
     spouseUnemploymentDetails?: UnemploymentDetails;
+    spouseSelfEmployedDetails?: SelfEmployedDetails;
     charitableGiving?: CharitableRange;
     hasBusinessOwnership?: boolean;
     hasEmployerStock?: boolean;
@@ -73,8 +76,10 @@ export default function Index() {
       realEstateRange: profile.realEstateRange!,
       employmentStatus: data.employmentStatus,
       unemploymentDetails: data.unemploymentDetails,
+      selfEmployedDetails: data.selfEmployedDetails,
       spouseEmploymentStatus: data.spouseEmploymentStatus,
       spouseUnemploymentDetails: data.spouseUnemploymentDetails,
+      spouseSelfEmployedDetails: data.spouseSelfEmployedDetails,
       charitableGiving: data.charitableGiving,
       hasBusinessOwnership: data.hasBusinessOwnership,
       hasEmployerStock: data.hasEmployerStock,
