@@ -1,499 +1,441 @@
 
 import { Persona, Strategy, StrategyId, TriggerResult } from "@/types/persona";
 
-export const STRATEGIES: Record<StrategyId, Strategy> = {
-  rothConversions: {
+export const STRATEGIES: Strategy[] = [
+  {
     id: "rothConversions",
-    title: "Roth Conversions",
-    whyThisMayApply: "Low income years are ideal for locking in low tax rates.",
-    scenario: "Pay taxes now at a lower rate to enjoy tax-free growth forever.",
-    decisionWindow: "Year-end (Dec 31)",
-    professional: "CPA",
+    title: "Roth Conversion Planning",
+    whyThisMayApply: "Income gaps can create bracket opportunities",
+    scenario:
+      "Periods between roles or early retirement can temporarily reduce taxable income.\nThat window may support multi-year tax-bucket planning.",
+    decisionWindow: "Often strongest before RMD years and Medicare thresholds.",
+    professional: "CPA + CFP",
     impact: "Material",
     cta: "Worth discussing",
-    cpaSummary: "Evaluate Roth conversion opportunities given current marginal tax bracket vs. future expectations.",
+    cpaSummary:
+      "Evaluate multi-year partial conversions to manage future RMD exposure and bracket compression; model interactions with Medicare IRMAA and Social Security taxation where applicable.",
   },
-  backdoorRoth: {
+  {
     id: "backdoorRoth",
     title: "Backdoor Roth IRA",
-    whyThisMayApply: "High income prevents direct Roth contributions, but this loophole works.",
-    scenario: "Contribute to a Traditional IRA, then convert to Roth immediately.",
-    decisionWindow: "Tax deadline (April 15)",
-    professional: "CPA + CFP",
+    whyThisMayApply: "Roth access despite income limits",
+    scenario:
+      "Some households exceed direct Roth contribution limits.\nA structured nondeductible IRA + conversion may be relevant.",
+    decisionWindow: "Best when pro-rata IRA aggregation is manageable.",
+    professional: "CPA",
     impact: "Potential",
     cta: "Worth discussing",
-    cpaSummary: "Confirm no pro-rata rule issues (existing pre-tax IRA balances) before executing Backdoor Roth.",
+    cpaSummary:
+      "Confirm IRA aggregation/pro-rata exposure and document basis using Form 8606; avoid wash issues with pre-tax IRA balances.",
   },
-  megaBackdoorRoth: {
+  {
     id: "megaBackdoorRoth",
     title: "Mega Backdoor Roth",
-    whyThisMayApply: "Your 401(k) plan allows substantial extra after-tax contributions.",
-    scenario: "Supercharge your Roth savings beyond standard limits.",
-    decisionWindow: "Year-round",
+    whyThisMayApply: "401(k) plan may allow large Roth funding",
+    scenario:
+      "Some employer plans allow after-tax contributions above deferral limits.\nIn-plan conversion or rollover may shift growth to Roth treatment.",
+    decisionWindow: "Requires specific plan features (after-tax + conversion).",
     professional: "CPA + CFP",
-    impact: "Advanced",
+    impact: "Material",
     cta: "Worth discussing",
-    cpaSummary: "Review 401(k) plan document for after-tax contribution and in-service withdrawal/conversion features.",
+    cpaSummary:
+      "Validate plan provisions, annual limits, and conversion mechanics; confirm payroll execution and basis tracking for after-tax contributions.",
   },
-  rmdQcd: {
+  {
     id: "rmdQcd",
-    title: "RMDs & QCDs",
-    whyThisMayApply: "You are approaching or past RMD age with charitable intent.",
-    scenario: "Donate directly from your IRA to satisfy RMDs without raising taxable income.",
-    decisionWindow: "Year-end (Dec 31)",
+    title: "RMD & QCD Coordination",
+    whyThisMayApply: "Charitable intent can reduce taxable RMD impact",
+    scenario:
+      "For IRA owners with charitable giving, directing gifts as QCDs can reduce AGI.\nThat may affect brackets, IRMAA exposure, and deductions.",
+    decisionWindow: "After eligibility age; must be executed correctly each year.",
     professional: "CPA",
     impact: "Material",
     cta: "Worth discussing",
-    cpaSummary: "Utilize Qualified Charitable Distributions (QCDs) to satisfy RMDs and lower AGI.",
+    cpaSummary:
+      "Confirm QCD eligibility and execution (direct to charity); coordinate with RMD calculations and ensure gifts are not also claimed as itemized deductions.",
   },
-  qlac: {
+  {
     id: "qlac",
-    title: "QLAC",
-    whyThisMayApply: "You want to defer RMDs and ensure longevity protection.",
-    scenario: "Move IRA funds to a longevity annuity to delay taxes until age 85.",
-    decisionWindow: "Year-round",
-    professional: "CFP",
-    impact: "Potential",
-    cta: "Worth discussing",
-    cpaSummary: "Consider QLAC purchase to reduce current RMD obligation and provide longevity insurance.",
-  },
-  nua: {
-    id: "nua",
-    title: "Net Unrealized Appreciation (NUA)",
-    whyThisMayApply: "You have highly appreciated company stock in your 401(k).",
-    scenario: "Pay lower capital gains rates on stock appreciation instead of income tax.",
-    decisionWindow: "Upon distribution",
+    title: "QLAC Review",
+    whyThisMayApply: "May reduce RMD base in some cases",
+    scenario:
+      "Certain IRA/plan assets may be allocated to a QLAC structure.\nThis can shift timing of required distributions within allowed limits.",
+    decisionWindow: "Before/around RMD age; product and limit rules apply.",
     professional: "CPA + CFP",
     impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Evaluate NUA treatment for employer stock distribution vs. rollover to IRA.",
+    cpaSummary:
+      "Confirm statutory limits and plan eligibility; model tradeoffs between deferral, liquidity, and overall distribution strategy.",
   },
-  assetLocation: {
-    id: "assetLocation",
-    title: "Asset Location",
-    whyThisMayApply: "You have a mix of taxable and tax-advantaged accounts.",
-    scenario: "Place bonds in IRAs and stocks in brokerage to minimize tax drag.",
-    decisionWindow: "Year-round",
-    professional: "CFP",
-    impact: "Material",
+  {
+    id: "nua",
+    title: "NUA for Employer Stock",
+    whyThisMayApply: "Employer stock in a 401(k) may be taxed inefficiently",
+    scenario:
+      "Company stock held in a qualified plan can sometimes be distributed with NUA treatment.\nThis can change ordinary vs capital-gain character.",
+    decisionWindow: "Requires lump-sum distribution timing rules.",
+    professional: "CPA",
+    impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Optimize asset location: high-yield assets in tax-deferred, high-growth in Roth/Taxable.",
+    cpaSummary:
+      "Assess eligibility triggers and distribution structure; quantify ordinary income on basis vs LTCG on NUA and evaluate concentration/risk controls.",
   },
-  taxLossHarvesting: {
+  {
+    id: "assetLocation",
+    title: "Asset Location Review",
+    whyThisMayApply: "Account type mix can reduce ongoing tax drag",
+    scenario:
+      "Holding certain assets in taxable vs retirement accounts can change tax friction.\nLocation choices can matter over long horizons.",
+    decisionWindow: "Anytime; revisit during major allocation or life changes.",
+    professional: "Advisor / CPA",
+    impact: "Potential",
+    cta: "Worth discussing",
+    cpaSummary:
+      "Review interest/dividend character and turnover; coordinate with client’s bracket, state taxes, and distribution planning.",
+  },
+  {
     id: "taxLossHarvesting",
     title: "Tax-Loss Harvesting",
-    whyThisMayApply: "You have a taxable brokerage account with market exposure.",
-    scenario: "Sell losing investments to offset gains and up to $3,000 of income.",
-    decisionWindow: "Year-end (Dec 31)",
-    professional: "CFP",
+    whyThisMayApply: "Market volatility can create usable losses",
+    scenario:
+      "Down markets can generate capital losses in taxable accounts.\nLosses may offset gains and potentially reduce future taxes.",
+    decisionWindow: "Most relevant during drawdowns and rebalancing cycles.",
+    professional: "Advisor / CPA",
     impact: "Potential",
     cta: "Worth discussing",
-    cpaSummary: "Harvest capital losses to offset gains and up to $3k of ordinary income annually.",
+    cpaSummary:
+      "Confirm wash-sale constraints, tracking across accounts, and capital gain planning; document lot selection and replacement securities.",
   },
-  costBasisPlanning: {
+  {
     id: "costBasisPlanning",
-    title: "Cost Basis Planning",
-    whyThisMayApply: "You intend to leave assets to heirs.",
-    scenario: "Hold appreciated assets until death to reset their tax basis.",
-    decisionWindow: "Lifetime",
-    professional: "Estate Attorney",
-    impact: "Material",
+    title: "Cost Basis & Lot Selection",
+    whyThisMayApply: "Lot selection can change realized gains",
+    scenario:
+      "Selling specific lots can materially change taxable capital gains.\nBasis strategy matters in concentrated positions.",
+    decisionWindow: "At every sale/rebalance in taxable accounts.",
+    professional: "CPA",
+    impact: "Potential",
     cta: "Worth discussing",
-    cpaSummary: "Preserve low-basis assets for step-up in basis at death.",
+    cpaSummary:
+      "Ensure specific-lot selection is enabled at custodian; coordinate with gain targets and charitable gifting of low-basis shares where appropriate.",
   },
-  muniBonds: {
+  {
     id: "muniBonds",
-    title: "Municipal Bonds",
-    whyThisMayApply: "You are in a high tax bracket.",
-    scenario: "Earn tax-free income from state and local government bonds.",
-    decisionWindow: "Year-round",
-    professional: "CFP",
+    title: "Municipal Bond Fit Check",
+    whyThisMayApply: "Taxable interest may be avoidable",
+    scenario:
+      "For some brackets and states, municipal bonds may improve after-tax income.\nSuitability depends on yield, risk, and state rules.",
+    decisionWindow: "When building or revising fixed income allocations.",
+    professional: "Advisor / CPA",
     impact: "Potential",
     cta: "Worth discussing",
-    cpaSummary: "Compare tax-equivalent yield of munis vs. taxable bonds given marginal tax rate.",
+    cpaSummary:
+      "Compare taxable-equivalent yield; confirm AMT considerations where relevant and evaluate credit risk and diversification.",
   },
-  hsa: {
+  {
     id: "hsa",
-    title: "HSA Optimization",
-    whyThisMayApply: "You have access to a High Deductible Health Plan.",
-    scenario: "Triple tax advantage: tax-free in, growth, and out for health.",
-    decisionWindow: "Tax deadline (April 15)",
-    professional: "CFP",
-    impact: "Material",
-    cta: "Worth discussing",
-    cpaSummary: "Maximize HSA contribution; invest funds for long-term tax-free growth.",
-  },
-  plan529: {
-    id: "plan529",
-    title: "529 Education Planning",
-    whyThisMayApply: "You want to support education costs tax-efficiently.",
-    scenario: "Grow funds tax-free for tuition, or roll over to a Roth IRA later.",
-    decisionWindow: "Year-end (Dec 31)",
-    professional: "CFP",
+    title: "Health Savings Account Strategy",
+    whyThisMayApply: "HSA rules can create tax-advantaged capacity",
+    scenario:
+      "For eligible households, HSA contributions and reimbursements can be structured to reduce taxes.\nReceipts and timing matter.",
+    decisionWindow: "During HDHP coverage years and prior to Medicare enrollment.",
+    professional: "CPA",
     impact: "Potential",
     cta: "Worth discussing",
-    cpaSummary: "Utilize 529 plans for state tax deductions (if applicable) and tax-free education growth.",
+    cpaSummary:
+      "Confirm HDHP eligibility and contribution limits; evaluate reimbursement strategy and recordkeeping; coordinate with Medicare enrollment timing.",
   },
-  daf: {
+  {
+    id: "plan529",
+    title: "529 Planning & 529-to-Roth Rules",
+    whyThisMayApply: "Education funding may overlap tax planning",
+    scenario:
+      "529 plans can support education goals and may offer additional planning flexibility.\nRules vary by state and beneficiary history.",
+    decisionWindow: "When funding education or multi-generation planning.",
+    professional: "CPA",
+    impact: "Potential",
+    cta: "Worth discussing",
+    cpaSummary:
+      "Validate state tax treatment, beneficiary rules, and eligibility for any rollover provisions; coordinate with financial-aid considerations.",
+  },
+  {
     id: "daf",
-    title: "Donor Advised Fund (DAF)",
-    whyThisMayApply: "You have a high income year and charitable intent.",
-    scenario: "Front-load donations now for a big deduction, distribute later.",
-    decisionWindow: "Year-end (Dec 31)",
+    title: "Donor-Advised Fund",
+    whyThisMayApply: "Bunched giving can increase deduction efficiency",
+    scenario:
+      "Some households prefer to front-load charitable deductions in high-income years.\nA DAF can separate deduction timing from grant timing.",
+    decisionWindow: "High income years, liquidity events, large gains.",
     professional: "CPA",
     impact: "Material",
     cta: "Worth discussing",
-    cpaSummary: "Bunch charitable contributions via DAF to exceed standard deduction threshold.",
+    cpaSummary:
+      "Coordinate AGI limits, substantiation, and gifting of appreciated assets; plan grant schedule and investment policy within the DAF.",
   },
-  crt: {
+  {
     id: "crt",
-    title: "Charitable Remainder Trust (CRT)",
-    whyThisMayApply: "You have highly appreciated assets and want income.",
-    scenario: "Sell assets tax-free, receive income for life, donate the rest.",
-    decisionWindow: "Transaction-specific",
-    professional: "Estate Attorney",
+    title: "Charitable Remainder Trust",
+    whyThisMayApply: "Appreciated assets + income goals",
+    scenario:
+      "Some donors use CRT structures to diversify appreciated assets and create income.\nThis requires careful legal and tax coordination.",
+    decisionWindow: "Before a concentrated sale; requires trust setup.",
+    professional: "CPA + Estate Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Model CRT benefits: immediate deduction, tax-deferral on sale, and income stream.",
+    cpaSummary:
+      "Model payout, deduction, and tier accounting; coordinate with attorney on trust drafting and compliance; evaluate suitability vs alternatives.",
   },
-  exchange1031: {
+  {
     id: "exchange1031",
     title: "1031 Exchange",
-    whyThisMayApply: "You own investment real estate.",
-    scenario: "Swap one property for another to defer capital gains taxes indefinitely.",
-    decisionWindow: "45 days post-sale",
+    whyThisMayApply: "Real estate gain deferral may be relevant",
+    scenario:
+      "Investment real estate sales can potentially defer gain via like-kind exchange.\nTiming rules are strict.",
+    decisionWindow: "At sale; requires qualified intermediary and deadlines.",
     professional: "CPA",
     impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Defer capital gains on real estate via like-kind exchange.",
+    cpaSummary:
+      "Confirm property eligibility, deadlines, and intermediary requirements; model depreciation recapture and replacement property basis implications.",
   },
-  rentalLossRules: {
+  {
     id: "rentalLossRules",
-    title: "Rental Loss Rules (PAL)",
-    whyThisMayApply: "You have rental properties generating losses.",
-    scenario: "Active participation may allow you to deduct up to $25k against income.",
-    decisionWindow: "Tax filing",
+    title: "Rental Loss Rules Review",
+    whyThisMayApply: "Rental losses may be limited or unlocked",
+    scenario:
+      "Rental losses can be restricted under passive activity rules.\nSome circumstances change deductibility and carryforwards.",
+    decisionWindow: "Annually; especially with rental growth or role changes.",
     professional: "CPA",
     impact: "Material",
     cta: "Worth discussing",
-    cpaSummary: "Review Passive Activity Loss rules; check active participation or real estate professional status.",
+    cpaSummary:
+      "Evaluate active participation thresholds, MAGI phaseouts, and real estate professional/material participation tests; track suspended losses.",
   },
-  conservationEasement: {
+  {
     id: "conservationEasement",
     title: "Conservation Easement",
-    whyThisMayApply: "You own land with development potential.",
-    scenario: "Restrict development to generate a significant charitable deduction.",
-    decisionWindow: "Year-end (Dec 31)",
-    professional: "Estate Attorney",
+    whyThisMayApply: "Land assets may support conservation planning",
+    scenario:
+      "Certain property owners explore conservation easements for charitable objectives.\nCompliance and valuation standards are strict.",
+    decisionWindow: "Before development decisions; requires specialized counsel.",
+    professional: "CPA + Estate Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Evaluate charitable deduction from conservation easement (ensure compliance with scrutiny).",
+    cpaSummary:
+      "Engage qualified appraisal and legal review; assess IRS scrutiny and avoid syndicated abusive structures; ensure substantiation is robust.",
   },
-  opportunityZones: {
+  {
     id: "opportunityZones",
-    title: "Opportunity Zones",
-    whyThisMayApply: "You have significant capital gains.",
-    scenario: "Reinvest gains into distressed areas to defer and reduce taxes.",
-    decisionWindow: "180 days post-sale",
-    professional: "CPA + CFP",
+    title: "Opportunity Zone Review",
+    whyThisMayApply: "Large capital gains may prompt deferral discussions",
+    scenario:
+      "Some investors reinvest eligible gains through Qualified Opportunity Funds.\nRules and outcomes depend on structure and holding period.",
+    decisionWindow: "Within statutory reinvestment deadlines after a gain event.",
+    professional: "CPA",
     impact: "Advanced",
+    cpaSummary:
+      "Confirm gain eligibility, deadlines, fund documentation, and exit planning; evaluate concentration and underlying investment risk.",
     cta: "Worth discussing",
-    cpaSummary: "Defer and reduce capital gains tax by investing in Qualified Opportunity Funds.",
   },
-  installmentSales: {
+  {
     id: "installmentSales",
-    title: "Installment Sales",
-    whyThisMayApply: "You are selling a business or property.",
-    scenario: "Receive payments over time to spread out tax liability.",
-    decisionWindow: "Transaction-specific",
+    title: "Installment Sale Planning",
+    whyThisMayApply: "Spreading gain may reduce bracket spikes",
+    scenario:
+      "Business or property sales may be structured to recognize gains over time.\nThis can alter bracket exposure and surtaxes.",
+    decisionWindow: "Before sale terms are finalized.",
     professional: "CPA",
-    impact: "Material",
+    impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Spread gain recognition over multiple years via installment sale method.",
+    cpaSummary:
+      "Model interest component, basis recovery, and credit risk; coordinate contract terms and consider interaction with NIIT and state taxes.",
   },
-  qsbs1202: {
+  {
     id: "qsbs1202",
-    title: "QSBS (Section 1202)",
-    whyThisMayApply: "You significantly invested in a small business.",
-    scenario: "Ideally, enjoy 100% tax-free gain on the sale of qualified stock.",
-    decisionWindow: "At investment & sale",
+    title: "QSBS (Section 1202) Check",
+    whyThisMayApply: "Qualified C-corp equity may allow exclusion",
+    scenario:
+      "Some founders/investors hold stock that may qualify for Section 1202 treatment.\nEligibility is technical and time-based.",
+    decisionWindow: "Before liquidation or secondary sale events.",
     professional: "CPA",
     impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Verify criteria for Qualified Small Business Stock exclusion (up to 100% gain exclusion).",
+    cpaSummary:
+      "Confirm original issuance, active business tests, holding period, and limitations; document corporate records supporting qualification.",
   },
-  nqdc: {
+  {
     id: "nqdc",
-    title: "Deferred Compensation (NQDC)",
-    whyThisMayApply: "You are a high-earning executive.",
-    scenario: "Defer salary/bonus to future years to lower current tax bracket.",
-    decisionWindow: "Prior year election",
-    professional: "CPA + CFP",
+    title: "Nonqualified Deferred Compensation",
+    whyThisMayApply: "Income timing may be controllable through employer plans",
+    scenario:
+      "Some executives can defer compensation into future years.\nThis can shift taxable income across retirement or lower-income periods.",
+    decisionWindow: "Elections must be made before the earning period.",
+    professional: "CPA",
     impact: "Material",
     cta: "Worth discussing",
-    cpaSummary: "Analyze benefit of deferring income vs. risk of unsecured creditor status.",
+    cpaSummary:
+      "Confirm plan election timing, payout schedule, and risk of employer credit exposure; model bracket effects and state residency considerations.",
   },
-  flpIncomeShift: {
+  {
     id: "flpIncomeShift",
-    title: "Family Limited Partnership (FLP)",
-    whyThisMayApply: "You own a business and want to involve family.",
-    scenario: "Shift business income to family members in lower tax brackets.",
-    decisionWindow: "Lifetime",
-    professional: "Estate Attorney",
+    title: "Family Entity & Income Shifting",
+    whyThisMayApply: "Business or family assets may need structure review",
+    scenario:
+      "Some families use entities to coordinate control, gifting, and administration.\nTax and estate outcomes depend on details and valuation.",
+    decisionWindow: "Before large gifts, liquidity events, or restructuring.",
+    professional: "CPA + Estate Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Utilize FLP for valuation discounts and income shifting to lower-bracket family members.",
+    cpaSummary:
+      "Coordinate valuation, documentation, and gifting strategy; confirm governance and economic substance to reduce audit risk.",
   },
-  homeSaleExclusion: {
+  {
     id: "homeSaleExclusion",
-    title: "Home Sale Exclusion",
-    whyThisMayApply: "You are selling your primary residence.",
-    scenario: "Exclude up to $500k of gain from taxes tax-free.",
-    decisionWindow: "Transaction-specific",
+    title: "Primary Home Sale Exclusion",
+    whyThisMayApply: "Home sale gains may be partially excludable",
+    scenario:
+      "Selling a primary residence can allow gain exclusion if tests are met.\nTiming and use rules drive eligibility.",
+    decisionWindow: "Before listing or changing residency status.",
     professional: "CPA",
-    impact: "Material",
+    impact: "Potential",
     cta: "Worth discussing",
-    cpaSummary: "Ensure Section 121 exclusion eligibility (2 out of 5 years ownership/use test).",
+    cpaSummary:
+      "Confirm ownership/use tests and partial exclusion eligibility; coordinate with relocation, divorce, or care facility transitions.",
   },
-  depreciationRecapture: {
+  {
     id: "depreciationRecapture",
-    title: "Depreciation Recapture",
-    whyThisMayApply: "You are selling a rental property.",
-    scenario: "Plan ahead to avoid a surprise tax bill on prior depreciation claims.",
-    decisionWindow: "Transaction-specific",
+    title: "Depreciation & Recapture Planning",
+    whyThisMayApply: "Real estate sales may trigger recapture",
+    scenario:
+      "Depreciation lowers taxable income but can be recaptured at sale.\nPlanning can reduce surprise tax bills.",
+    decisionWindow: "Before selling rental or business property.",
     professional: "CPA",
-    impact: "Potential",
-    cta: "Worth discussing",
-    cpaSummary: "Calculate potential unrecaptured Section 1250 gain tax liability on sale.",
-  },
-  spousalIra: {
-    id: "spousalIra",
-    title: "Spousal IRA",
-    whyThisMayApply: "One spouse has little to no earned income.",
-    scenario: "Working spouse contributes to a non-working spouse's retirement.",
-    decisionWindow: "Tax deadline (April 15)",
-    professional: "CFP",
-    impact: "Potential",
-    cta: "Worth discussing",
-    cpaSummary: "Fund Spousal IRA to double household tax-advantaged savings space.",
-  },
-  saversCredit: {
-    id: "saversCredit",
-    title: "Saver's Credit",
-    whyThisMayApply: "Your income is in the moderate range.",
-    scenario: "Get a tax credit just for contributing to your retirement account.",
-    decisionWindow: "Tax deadline (April 15)",
-    professional: "CPA",
-    impact: "Potential",
-    cta: "Worth discussing",
-    cpaSummary: "Check AGI thresholds for Retirement Savings Contributions Credit eligibility.",
-  },
-  lifeInsurancePlanning: {
-    id: "lifeInsurancePlanning",
-    title: "Life Insurance Planning",
-    whyThisMayApply: "You have dependents or estate tax concerns.",
-    scenario: "Provide liquidity and protection tax-free to beneficiaries.",
-    decisionWindow: "Lifetime",
-    professional: "CFP + Insurance",
     impact: "Material",
     cta: "Worth discussing",
-    cpaSummary: "Review policy needs regarding income replacement and estate liquidity.",
+    cpaSummary:
+      "Quantify depreciation history, recapture exposure, and options (timing, exchange, offsetting losses); coordinate with transaction structure.",
   },
-  dynastyTrust: {
-    id: "dynastyTrust",
-    title: "Dynasty Trust",
-    whyThisMayApply: "You want to pass significant wealth for generations.",
-    scenario: "Avoid estate taxes for multiple generations.",
-    decisionWindow: "Lifetime",
-    professional: "Estate Attorney",
+  {
+    id: "spousalIra",
+    title: "Spousal IRA Contribution",
+    whyThisMayApply: "One-earner households may have additional capacity",
+    scenario:
+      "In some cases, a nonworking spouse may still be eligible for IRA contributions.\nEligibility depends on income and filing status.",
+    decisionWindow: "Each tax year before contribution deadlines.",
+    professional: "CPA",
+    impact: "Potential",
+    cta: "Worth discussing",
+    cpaSummary:
+      "Confirm earned income requirements and contribution limits; coordinate deductibility rules and Roth eligibility.",
+  },
+  {
+    id: "saversCredit",
+    title: "Saver’s Credit Check",
+    whyThisMayApply: "Some incomes qualify for retirement contribution credits",
+    scenario:
+      "Certain taxpayers may qualify for a retirement savings credit.\nEligibility is income-based and time-sensitive.",
+    decisionWindow: "Each tax year; best identified during tax planning.",
+    professional: "CPA",
+    impact: "Potential",
+    cta: "Worth discussing",
+    cpaSummary:
+      "Confirm filing status thresholds and qualifying contributions; coordinate to maximize credit eligibility where appropriate.",
+  },
+  {
+    id: "lifeInsurancePlanning",
+    title: "Life Insurance Planning Review",
+    whyThisMayApply: "Some estate or liquidity plans involve insurance structures",
+    scenario:
+      "Insurance can be used for risk management and estate liquidity in certain plans.\nSuitability depends on objectives and costs.",
+    decisionWindow: "Before major estate decisions; requires underwriting lead time.",
+    professional: "CPA + Estate Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
-    cpaSummary: "Establish trust to minimize transfer taxes across multiple generations (GST tax planning).",
+    cpaSummary:
+      "Assess need, ownership structure (incl. trust ownership), premium schedule, and MEC risk; coordinate estate inclusion and liquidity objectives.",
   },
+  {
+    id: "dynastyTrust",
+    title: "Dynasty Trust Consideration",
+    whyThisMayApply: "Multi-generation planning may be relevant",
+    scenario:
+      "Some families plan for multi-generation wealth transfer structures.\nImplementation depends on exemptions, state law, and objectives.",
+    decisionWindow: "Best evaluated during estate planning cycles.",
+    professional: "CPA + Estate Attorney",
+    impact: "Advanced",
+    cta: "Worth discussing",
+    cpaSummary:
+      "Coordinate GST/exemption planning, situs selection, trustee design, and distribution standards; align with family governance goals.",
+  },
+];
+
+type TriggerRule = {
+  id: StrategyId;
+  any?: Array<(p: Persona) => boolean>;
+  all?: Array<(p: Persona) => boolean>;
+  reasons: Array<(p: Persona) => string | null>;
+  confidence: (p: Persona) => TriggerResult["confidence"];
 };
+
+const inRetirementRange = (p: Persona, ...ranges: Persona["retirementRange"][]) =>
+  ranges.includes(p.retirementRange);
+
+const RULES: TriggerRule[] = [
+  {
+    id: "rothConversions",
+    any: [
+      (p) => p.employment === "Unemployed",
+      (p) => p.employment === "Consulting",
+      (p) => p.ageBand === "55-59" || p.ageBand === "60-65",
+    ],
+    all: [(p) => inRetirementRange(p, "250k-500k", "500k-1M", "1M-2.5M", "2.5M-5M", "5M+")],
+    reasons: [
+      (p) => (p.employment === "Unemployed" ? "Income timing may be temporarily lower." : null),
+      (p) => (p.employment === "Consulting" ? "Variable income can create planning windows." : null),
+      (p) => ((p.ageBand === "55-59" || p.ageBand === "60-65") ? "Approaching distribution years increases timing sensitivity." : null),
+    ],
+    confidence: (p) =>
+      p.employment === "Unemployed" ? "High" : p.employment === "Consulting" ? "Medium" : "Low",
+  },
+  {
+    id: "nua",
+    all: [(p) => !!p.hasEmployerStockIn401k],
+    reasons: [(p) => (p.hasEmployerStockIn401k ? "Employer stock inside a qualified plan may have special tax treatment." : null)],
+    confidence: () => "High",
+  },
+  {
+    id: "taxLossHarvesting",
+    all: [(p) => !!p.hasTaxableBrokerage],
+    reasons: [(p) => (p.hasTaxableBrokerage ? "Taxable accounts may allow loss harvesting during volatility." : null)],
+    confidence: () => "Medium",
+  },
+  {
+    id: "exchange1031",
+    all: [(p) => p.realEstate === "Rental"],
+    reasons: [(p) => (p.realEstate === "Rental" ? "Selling investment property can raise gain-deferral questions." : null)],
+    confidence: () => "Medium",
+  },
+];
 
 export function evaluateStrategies(persona: Persona): TriggerResult[] {
   const results: TriggerResult[] = [];
+  const seen = new Set<StrategyId>();
 
-  // Helper to add a match
-  const addMatch = (id: StrategyId, reasons: string[], confidence: "Low" | "Medium" | "High" = "Medium") => {
-    results.push({
-      strategyId: id,
-      matched: true,
-      reasons,
-      confidence,
-    });
-  };
+  for (const rule of RULES) {
+    const anyOk = rule.any ? rule.any.some((fn) => fn(persona)) : true;
+    const allOk = rule.all ? rule.all.every((fn) => fn(persona)) : true;
 
-  const isHighNetWorth =
-    persona.retirementRange === "2.5M-5M" || persona.retirementRange === "5M+";
-  const isMidNetWorth =
-    persona.retirementRange === "1M-2.5M" || isHighNetWorth;
-  
-  const isOlder = persona.ageBand === "55-59" || persona.ageBand === "60-65";
-  const isYounger = !isOlder;
+    const matched = anyOk && allOk;
+    const reasons = rule.reasons.map((fn) => fn(persona)).filter((x): x is string => !!x);
 
-  // 1. Roth Conversions
-  // Trigger: Lower income years (consulting, severance, unemployed) or early retirement gap
-  if (
-    persona.employment === "Unemployed" ||
-    persona.employment === "Severance" ||
-    persona.employment === "Consulting"
-  ) {
-    addMatch("rothConversions", ["Income may be temporarily lower due to employment status."], "High");
-  } else if (isOlder && isHighNetWorth) {
-    addMatch("rothConversions", ["Potential to fill lower tax brackets before RMDs begin."], "Medium");
-  }
-
-  // 2. Backdoor Roth
-  // Trigger: High income (implied by high retirement savings usually)
-  if (isHighNetWorth && persona.employment === "Employed") {
-    addMatch(
-      "backdoorRoth",
-      ["High income likely limits direct Roth contributions.", "High savings rate suggests extra cash flow."],
-      "High"
-    );
-  }
-
-  // 3. Mega Backdoor Roth
-  if (persona.hasEmployerStockIn401k || (isHighNetWorth && persona.employment === "Employed")) {
-    addMatch(
-      "megaBackdoorRoth",
-      ["Likely access to robust 401(k) plans.", "Capacity to save beyond standard limits."],
-      "Medium"
-    );
-  }
-
-  // 4. RMDs & QCDs
-  if (isOlder && persona.charitableGivingIntent) {
-    addMatch(
-      "rmdQcd",
-      ["Approaching RMD age.", "Interest in charitable giving."],
-      "High"
-    );
-  }
-
-  // 5. QLAC
-  if (isOlder && isHighNetWorth) {
-    addMatch("qlac", ["Desire to defer RMD taxes further.", "Longevity protection needs."], "Medium");
-  }
-
-  // 6. NUA
-  if (persona.hasEmployerStockIn401k && isOlder) {
-    addMatch("nua", ["Employer stock in 401(k).", "Approaching distribution age."], "High");
-  }
-
-  // 7. Asset Location
-  if (persona.hasTaxableBrokerage) {
-    addMatch("assetLocation", ["Mix of taxable and tax-advantaged accounts."], "Medium");
-  }
-
-  // 8. Tax Loss Harvesting
-  if (persona.hasTaxableBrokerage) {
-    addMatch("taxLossHarvesting", ["Taxable account exposure."], "Medium");
-  }
-
-  // 9. Cost Basis Planning
-  if (isOlder && isMidNetWorth) {
-    addMatch("costBasisPlanning", ["Estate planning considerations.", "Appreciated assets over time."], "Medium");
-  }
-
-  // 10. Muni Bonds
-  if (isHighNetWorth && persona.hasTaxableBrokerage) {
-    addMatch("muniBonds", ["High tax bracket likely.", "Taxable account present."], "Medium");
-  }
-
-  // 11. HSA
-  if (persona.hasHSA) {
-    addMatch("hsa", ["Existing HSA account."], "High");
-  }
-
-  // 12. 529 Plans
-  if (persona.has529) {
-    addMatch("plan529", ["Existing education savings."], "High");
-  } else if (isMidNetWorth && isYounger) {
-    addMatch("plan529", ["Likely optimal for education saving goals."], "Low");
-  }
-
-  // 13. DAF
-  if (persona.charitableGivingIntent && (isMidNetWorth || persona.employment === "Severance")) {
-    // Severance often means a high income year spike
-    addMatch("daf", ["Charitable intent with potential high income year."], "High");
-  }
-
-  // 14. CRT
-  if (isHighNetWorth && persona.charitableGivingIntent && isOlder) {
-    addMatch("crt", ["High net worth with charitable intent.", "Need for income stream."], "Medium");
-  }
-
-  // 15. 1031 Exchange
-  if (persona.realEstate === "Rental") {
-    addMatch("exchange1031", ["Investment real estate ownership."], "High");
-  }
-
-  // 16. Rental Loss Rules
-  if (persona.realEstate === "Rental") {
-    addMatch("rentalLossRules", ["Potential rental losses to manage."], "Medium");
-  }
-
-  // 17. Conservation Easement
-  if (isHighNetWorth && persona.realEstate !== "None") {
-    addMatch("conservationEasement", ["High income/assets.", "Potential land ownership."], "Low");
-  }
-
-  // 18. Opportunity Zones
-  if (isHighNetWorth && persona.hasTaxableBrokerage) {
-    addMatch("opportunityZones", ["Potential significant capital gains."], "Low");
-  }
-
-  // 19. Installment Sales
-  if (persona.businessOwnerOrEquity && isOlder) {
-    addMatch("installmentSales", ["Potential business exit planning."], "Medium");
-  }
-
-  // 20. QSBS
-  if (persona.businessOwnerOrEquity) {
-    addMatch("qsbs1202", ["Business equity ownership."], "High");
-  }
-
-  // 21. NQDC
-  if (isHighNetWorth && persona.employment === "Employed") {
-    addMatch("nqdc", ["Executive level income likely."], "Medium");
-  }
-
-  // 22. FLP Income Shifting
-  if (persona.businessOwnerOrEquity && isHighNetWorth) {
-    addMatch("flpIncomeShift", ["Business asset protection.", "Family wealth transfer."], "Medium");
-  }
-
-  // 23. Home Sale Exclusion
-  if (persona.realEstate === "Primary" || persona.realEstate === "Rental") {
-    addMatch("homeSaleExclusion", ["Property ownership."], "Low");
-  }
-
-  // 24. Depreciation Recapture
-  if (persona.realEstate === "Rental") {
-    addMatch("depreciationRecapture", ["Rental property sale planning."], "Medium");
-  }
-
-  // 25. Spousal IRA
-  if (persona.maritalStatus === "Married" && (persona.employment === "Employed" || persona.employment === "Consulting")) {
-    addMatch("spousalIra", ["Married with earned income.", "Potential non-working spouse."], "Medium");
-  }
-
-  // 26. Savers Credit
-  if (persona.retirementRange === "<250k" && persona.employment !== "Unemployed") {
-    addMatch("saversCredit", ["Lower asset base suggests income eligibility."], "Medium");
-  }
-
-  // 27. Life Insurance
-  if (persona.maritalStatus === "Married" || isHighNetWorth) {
-    addMatch("lifeInsurancePlanning", ["Estate protection needs."], "Medium");
-  }
-
-  // 28. Dynasty Trust
-  if (isHighNetWorth && persona.planningHorizonYears && persona.planningHorizonYears > 20) {
-    addMatch("dynastyTrust", ["Multi-generational wealth goals."], "Medium");
+    if (matched) {
+      results.push({
+        strategyId: rule.id,
+        matched,
+        reasons,
+        confidence: rule.confidence(persona),
+      });
+      seen.add(rule.id);
+    }
   }
 
   return results;
