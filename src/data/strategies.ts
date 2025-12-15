@@ -120,7 +120,13 @@ function computeImpact(profile: UserProfile, strategy: Strategy, flags: Transiti
       return 'medium';
     
     default:
-      const baseImpact = strategy.impact;
+      // Normalize ImpactLabel to 'high' | 'medium' | 'low'
+      const impactMap: Record<string, 'high' | 'medium' | 'low'> = {
+        'high': 'high', 'Advanced': 'high',
+        'medium': 'medium', 'Material': 'medium',
+        'low': 'low', 'Potential': 'low'
+      };
+      const baseImpact = impactMap[strategy.impact] || 'medium';
       if (retirementIndex === 0) {
         if (baseImpact === 'high') return 'medium';
         if (baseImpact === 'medium') return 'low';
