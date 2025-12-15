@@ -2,10 +2,10 @@ import { useState, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ChevronDown, ChevronUp, ListTodo, ArrowRight } from "lucide-react";
+import { ChevronDown, ChevronUp, ListTodo, ArrowRight, Zap, TrendingUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Recommendation } from "@/types/portfolio";
+import { cn } from "@/lib/utils";
 
 interface ActionPlanPanelProps {
   actionPlan: Recommendation[];
@@ -17,16 +17,16 @@ export interface ActionPlanPanelRef {
   toggle: () => void;
 }
 
-function priorityVariant(p: number): "destructive" | "secondary" | "outline" {
+function priorityVariant(p: number): "destructive" | "default" | "secondary" {
   if (p <= 2) return "destructive";
-  if (p === 3) return "secondary";
-  return "outline";
+  if (p === 3) return "default";
+  return "secondary";
 }
 
 function priorityLabel(p: number): string {
-  if (p <= 2) return "High";
-  if (p === 3) return "Medium";
-  return "Low";
+  if (p <= 2) return "Critical";
+  if (p === 3) return "Important";
+  return "Quick Win";
 }
 
 // Map category to verb-first action title
@@ -94,38 +94,39 @@ export const ActionPlanPanel = forwardRef<ActionPlanPanelRef, ActionPlanPanelPro
   const optimizeNext = actionPlan.filter(r => r.priority > 2);
 
   return (
-    <Card className="border-border/50">
+    <Card className="border-none shadow-soft-lg bg-card/80 backdrop-blur-sm overflow-hidden">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full text-left"
+        className="w-full text-left transition-colors hover:bg-muted/10 group"
       >
-        <CardContent className="p-3 sm:p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <ListTodo className="h-5 w-5 text-primary shrink-0" />
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">Action Plan</span>
-                  <Badge variant="secondary" className="text-xs px-1.5 py-0">
-                    {actionPlan.length}
+        <CardContent className="p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start gap-4 min-w-0">
+              <div className="p-2.5 rounded-full bg-primary/10 text-primary mt-0.5 group-hover:scale-110 transition-transform">
+                <ListTodo className="h-6 w-6" />
+              </div>
+              <div className="min-w-0 space-y-1">
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-lg text-foreground">Action Plan</span>
+                  <Badge variant="secondary" className="px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                    {actionPlan.length} Items
                   </Badge>
                 </div>
-                {!isExpanded && (
-                  <p className="text-xs text-muted-foreground truncate">
-                    {fixFirst.length > 0 
-                      ? `${fixFirst.length} high priority item${fixFirst.length > 1 ? 's' : ''} to address`
-                      : "Optimization opportunities available"
-                    }
-                  </p>
-                )}
+                <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
+                  {!isExpanded 
+                    ? (fixFirst.length > 0 
+                        ? `${fixFirst.length} high priority item${fixFirst.length > 1 ? 's' : ''} require your attention.`
+                        : "Optimization opportunities available to improve your strategy.")
+                    : "Prioritized steps to strengthen your portfolio."}
+                </p>
               </div>
             </div>
             <motion.div
               animate={{ rotate: isExpanded ? 180 : 0 }}
               transition={{ duration: 0.2 }}
-              className="shrink-0"
+              className="shrink-0 p-1 rounded-full bg-muted/20 group-hover:bg-muted/40 transition-colors"
             >
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              <ChevronDown className="h-5 w-5 text-muted-foreground" />
             </motion.div>
           </div>
         </CardContent>
@@ -137,24 +138,21 @@ export const ActionPlanPanel = forwardRef<ActionPlanPanelRef, ActionPlanPanelPro
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
           >
-            <CardContent className="pt-0 px-3 sm:px-4 pb-3 sm:pb-4 space-y-3">
-              <Separator />
+            <CardContent className="pt-0 px-5 sm:px-6 pb-6 sm:pb-8 space-y-8">
               
-              {/* Intro note */}
-              <p className="text-xs text-muted-foreground">
-                Start with High priority items. Small changes can reduce risk quickly.
-              </p>
-
               {/* Fix First Section */}
               {fixFirst.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                    Fix First
-                  </h4>
-                  <div className="space-y-1.5">
+                <div className="space-y-4 animate-fade-in">
+                  <div className="flex items-center gap-2 text-destructive">
+                    <Zap className="h-4 w-4" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider">
+                      Critical Actions
+                    </h4>
+                  </div>
+                  <div className="grid gap-3">
                     {fixFirst.map((rec) => (
                       <ActionItem
                         key={rec.id}
@@ -168,11 +166,14 @@ export const ActionPlanPanel = forwardRef<ActionPlanPanelRef, ActionPlanPanelPro
 
               {/* Optimize Next Section */}
               {optimizeNext.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                    Optimize Next
-                  </h4>
-                  <div className="space-y-1.5">
+                <div className="space-y-4 animate-fade-in delay-100">
+                  <div className="flex items-center gap-2 text-primary">
+                    <TrendingUp className="h-4 w-4" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider">
+                      Optimization Opportunities
+                    </h4>
+                  </div>
+                  <div className="grid gap-3">
                     {optimizeNext.map((rec) => (
                       <ActionItem
                         key={rec.id}
@@ -187,10 +188,10 @@ export const ActionPlanPanel = forwardRef<ActionPlanPanelRef, ActionPlanPanelPro
               {/* Collapse button */}
               <button
                 onClick={() => setIsExpanded(false)}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mx-auto pt-1"
+                className="w-full flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2 border-t border-border/40 mt-4"
               >
-                <ChevronUp className="h-3 w-3" />
-                Collapse
+                <ChevronUp className="h-4 w-4" />
+                Collapse Plan
               </button>
             </CardContent>
           </motion.div>
@@ -210,31 +211,43 @@ function ActionItem({ recommendation, onSelectCategory }: ActionItemProps) {
   const whyItMatters = getWhyItMatters(recommendation);
 
   return (
-    <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-muted/30 border border-border/30">
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <Badge variant={priorityVariant(recommendation.priority)} className="text-[10px] px-1.5 py-0 shrink-0">
+    <div 
+      onClick={(e) => {
+        if (recommendation.category && onSelectCategory) {
+          e.stopPropagation();
+          onSelectCategory(recommendation.category);
+        }
+      }}
+      className={cn(
+        "group relative flex flex-col sm:flex-row sm:items-center justify-between gap-4",
+        "p-4 rounded-xl border border-border/40 bg-card hover:bg-muted/20 hover:border-border/80 hover:shadow-sm",
+        "transition-all duration-200 cursor-pointer"
+      )}
+    >
+      <div className="min-w-0 flex-1 space-y-1.5">
+        <div className="flex items-center gap-3">
+          <Badge 
+            variant={priorityVariant(recommendation.priority)} 
+            className="text-[10px] sm:text-xs font-bold px-2 py-0.5 uppercase tracking-wide shrink-0 rounded-md"
+          >
             {priorityLabel(recommendation.priority)}
           </Badge>
-          <span className="text-sm font-medium truncate">{verbTitle}</span>
+          <span className="text-base font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+            {verbTitle}
+          </span>
         </div>
-        <p className="text-[11px] text-muted-foreground mt-0.5 truncate pl-[calc(theme(spacing.1.5)+theme(spacing.2)+2ch)]">
+        <p className="text-sm text-muted-foreground pl-0 sm:pl-[calc(theme(spacing.2)+6ch)] line-clamp-2 sm:line-clamp-1">
           {whyItMatters}
         </p>
       </div>
+      
       {recommendation.category && onSelectCategory && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="shrink-0 h-7 px-2 text-xs"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelectCategory(recommendation.category);
-          }}
-        >
-          View
-          <ArrowRight className="h-3 w-3 ml-1" />
-        </Button>
+        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-none border-border/30">
+          <span className="text-xs font-medium text-primary sm:hidden">Tap to view</span>
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors ml-auto sm:ml-0">
+            <ArrowRight className="h-4 w-4" />
+          </div>
+        </div>
       )}
     </div>
   );

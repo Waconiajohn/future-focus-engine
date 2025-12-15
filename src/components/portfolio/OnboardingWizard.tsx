@@ -91,170 +91,150 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-lg border-border/50">
-        <CardHeader className="text-center pb-2">
-          <div className="flex items-center justify-center gap-2 mb-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 sm:p-6">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center p-3 rounded-full bg-primary/10 mb-4">
             <Shield className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">PortfolioGuard</span>
           </div>
-          <CardTitle className="text-xl">Let's set up your profile</CardTitle>
-          <CardDescription>
-            Step {step} of {totalSteps}
-          </CardDescription>
+          <h1 className="text-2xl font-bold tracking-tight">Setup your profile</h1>
           
-          {/* Progress bar */}
-          <div className="flex gap-2 mt-4">
+          {/* Progress indicators */}
+          <div className="flex justify-center gap-2">
             {Array.from({ length: totalSteps }).map((_, i) => (
               <div
                 key={i}
                 className={cn(
-                  'h-1 flex-1 rounded-full transition-colors',
-                  i < step ? 'bg-primary' : 'bg-muted'
+                  'h-1.5 w-8 rounded-full transition-all duration-300',
+                  i + 1 === step ? 'bg-primary w-12' : i + 1 < step ? 'bg-primary/40' : 'bg-muted'
                 )}
               />
             ))}
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent className="pt-6">
-          {/* Step 1: Name */}
-          {step === 1 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">What's your name?</h3>
-                  <p className="text-sm text-muted-foreground">
-                    This helps personalize your portfolio reports.
+        <Card className="border-none shadow-soft-lg bg-card/80 backdrop-blur-sm">
+          <CardContent className="pt-8 px-6 pb-8">
+            {/* Step 1: Name */}
+            {step === 1 && (
+              <div className="space-y-6 animate-fade-in">
+                <div className="space-y-2 text-center">
+                  <h2 className="text-xl font-semibold">What should we call you?</h2>
+                  <p className="text-muted-foreground">
+                    We'll use this for your personalized reports.
                   </p>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="name">Your Name</Label>
-                <Input
-                  id="name"
-                  placeholder="Enter your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  autoFocus
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Date of Birth */}
-          {step === 2 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">When were you born?</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Your age helps us provide better retirement planning insights.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="dob">Date of Birth (Optional)</Label>
-                <Input
-                  id="dob"
-                  type="date"
-                  value={dateOfBirth}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Risk Tolerance */}
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Target className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">What's your risk tolerance?</h3>
-                  <p className="text-sm text-muted-foreground">
-                    This helps us benchmark your portfolio appropriately.
-                  </p>
-                </div>
-              </div>
-
-              <RadioGroup
-                value={riskTolerance}
-                onValueChange={(value) => setRiskTolerance(value as RiskTolerance)}
-                className="space-y-3"
-              >
-                {RISK_OPTIONS.map((option) => (
-                  <div
-                    key={option.value}
-                    className={cn(
-                      'flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors',
-                      riskTolerance === option.value
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
-                    )}
-                    onClick={() => setRiskTolerance(option.value)}
+                <div className="space-y-4 pt-4">
+                  <Input
+                    id="name"
+                    placeholder="Enter your first name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    autoFocus
+                    className="h-12 text-lg text-center"
+                  />
+                  <Button 
+                    className="w-full h-12 text-base font-medium rounded-xl" 
+                    onClick={handleNext}
+                    disabled={!canProceed()}
                   >
-                    <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
-                    <div>
-                      <Label htmlFor={option.value} className="font-medium cursor-pointer">
-                        {option.label}
-                      </Label>
-                      <p className="text-sm text-muted-foreground mt-1">
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Date of Birth */}
+            {step === 2 && (
+              <div className="space-y-6 animate-fade-in">
+                <div className="space-y-2 text-center">
+                  <h2 className="text-xl font-semibold">When were you born?</h2>
+                  <p className="text-muted-foreground">
+                    This helps us calculate your investment timeline.
+                  </p>
+                </div>
+
+                <div className="space-y-4 pt-4">
+                  <Input
+                    id="dob"
+                    type="date"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    className="h-12 text-lg justify-center text-center"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button variant="outline" onClick={handleBack} className="h-12 rounded-xl">
+                      Back
+                    </Button>
+                    <Button onClick={handleNext} className="h-12 rounded-xl">
+                      Continue
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Risk Tolerance */}
+            {step === 3 && (
+              <div className="space-y-6 animate-fade-in">
+                <div className="space-y-2 text-center">
+                  <h2 className="text-xl font-semibold">What's your investment style?</h2>
+                  <p className="text-muted-foreground">
+                    Select the option that best describes you.
+                  </p>
+                </div>
+
+                <div className="space-y-3 pt-2">
+                  {RISK_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setRiskTolerance(option.value)}
+                      className={cn(
+                        'w-full text-left p-4 rounded-xl border-2 transition-all duration-200 outline-none',
+                        riskTolerance === option.value
+                          ? 'border-primary bg-primary/5 shadow-sm'
+                          : 'border-transparent bg-muted/30 hover:bg-muted/50'
+                      )}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-foreground">{option.label}</span>
+                        {riskTolerance === option.value && (
+                          <Check className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {option.description}
                       </p>
-                    </div>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-          )}
+                    </button>
+                  ))}
+                </div>
 
-          {/* Navigation buttons */}
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              disabled={step === 1}
-              className="gap-1"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Back
-            </Button>
-
-            {step < totalSteps ? (
-              <Button onClick={handleNext} disabled={!canProceed()} className="gap-1">
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button onClick={handleComplete} disabled={saving} className="gap-1">
-                {saving ? 'Saving...' : 'Complete'}
-                <Check className="h-4 w-4" />
-              </Button>
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <Button variant="outline" onClick={handleBack} className="h-12 rounded-xl">
+                    Back
+                  </Button>
+                  <Button 
+                    onClick={handleComplete} 
+                    disabled={saving} 
+                    className="h-12 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {saving ? 'Creating...' : 'Finish Setup'}
+                  </Button>
+                </div>
+              </div>
             )}
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Skip link */}
-          <div className="text-center mt-4">
-            <button
-              onClick={onComplete}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Skip for now
-            </button>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Skip link */}
+        <button
+          onClick={onComplete}
+          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+        >
+          Skip customization for now
+        </button>
+      </div>
     </div>
   );
 }
