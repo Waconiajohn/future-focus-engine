@@ -1,6 +1,6 @@
 import { MatchedStrategy } from "@/types/persona";
 import { cn } from "@/lib/utils";
-import { Clock, User } from "lucide-react";
+import { Clock, User, BarChart3 } from "lucide-react";
 
 interface StrategyCardProps {
   strategy: MatchedStrategy;
@@ -25,8 +25,28 @@ const evaluatorLabels: Record<string, string> = {
   'CPA/CFP/Attorney': 'CPA, CFP, or Estate Attorney'
 };
 
+// Impact displayed as guidance, not conclusions
+const impactConfig: Record<string, { label: string; description: string; className: string }> = {
+  high: {
+    label: 'Higher Relevance',
+    description: 'Aligns strongly with your inputs',
+    className: 'bg-sage/10 text-sage border-sage/20'
+  },
+  medium: {
+    label: 'Moderate Relevance',
+    description: 'Aligns with assets and timing',
+    className: 'bg-gold/10 text-gold border-gold/20'
+  },
+  low: {
+    label: 'Lower Relevance',
+    description: 'Applies, but scope may be limited',
+    className: 'bg-muted text-muted-foreground border-border'
+  }
+};
+
 export function StrategyCard({ strategy, index }: StrategyCardProps) {
   const isTimingSensitive = strategy.category === 'timing' || (strategy.transitionYearPriority && strategy.transitionYearPriority > 50);
+  const impact = impactConfig[strategy.computedImpact];
 
   return (
     <div
@@ -36,17 +56,27 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
       )}
       style={{ animationDelay: `${(index + 1) * 100}ms` }}
     >
-      {/* Header with Category */}
-      <div className="flex items-center gap-2 mb-4">
-        {isTimingSensitive && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gold/10 text-gold text-xs font-medium">
-            <Clock className="w-3 h-3" />
-            Time-Sensitive
+      {/* Header with Category & Impact */}
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          {isTimingSensitive && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gold/10 text-gold text-xs font-medium">
+              <Clock className="w-3 h-3" />
+              Time-Sensitive
+            </span>
+          )}
+          <span className="text-xs text-muted-foreground">
+            {categoryLabels[strategy.category] || strategy.category}
           </span>
-        )}
-        <span className="text-xs text-muted-foreground">
-          {categoryLabels[strategy.category] || strategy.category}
-        </span>
+        </div>
+        {/* Impact Indicator - displayed as guidance */}
+        <div className={cn(
+          "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border shrink-0",
+          impact.className
+        )} title={impact.description}>
+          <BarChart3 className="w-3 h-3" />
+          <span>{impact.label}</span>
+        </div>
       </div>
 
       {/* Title */}
