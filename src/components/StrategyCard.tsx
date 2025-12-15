@@ -12,7 +12,10 @@ const categoryLabels: Record<string, string> = {
   structure: "Account Structure",
   withdrawal: "Withdrawal Planning",
   giving: "Charitable Giving",
-  general: "General Planning"
+  general: "General Planning",
+  'real-estate': "Real Estate",
+  business: "Business Planning",
+  investment: "Investment Planning"
 };
 
 const evaluatorLabels: Record<string, string> = {
@@ -114,12 +117,12 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
         </p>
       </div>
 
-      {/* Who Typically Evaluates This */}
+      {/* Who Typically Reviews This */}
       <div className="mb-4 flex items-center gap-2">
         <User className="w-4 h-4 text-muted-foreground" />
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Who Typically Evaluates This
+            Who Typically Reviews This
           </p>
           <p className="text-sm text-foreground/90">
             {evaluatorLabels[strategy.evaluator] || strategy.evaluator}
