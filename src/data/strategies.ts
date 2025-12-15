@@ -1,36 +1,162 @@
-import { Strategy, UserProfile, TransitionYearFlags, computeTransitionFlags, RetirementRange, RealEstateRange } from '@/types/persona';
+import { Strategy, MatchedStrategy, UserProfile, TransitionYearFlags, computeTransitionFlags, RetirementRange, RealEstateRange, SuppressionConditions } from '@/types/persona';
 
-// Helper to check if user has meaningful pre-tax retirement accounts
+// ========================================
+// TIER ORDER DEFINITIONS
+// ========================================
+const RETIREMENT_TIER_ORDER: RetirementRange[] = ['<250k', '250k-500k', '500k-1m', '1m-2.5m', '2.5m-5m', '>5m'];
+const REAL_ESTATE_TIER_ORDER: RealEstateRange[] = ['none', '<250k', '250k-750k', '750k-2m', '>2m'];
+
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
+// Check if user has meaningful pre-tax retirement accounts
 function hasPreTaxRetirement(profile: UserProfile): boolean {
   return profile.retirementRange !== '<250k';
 }
 
-// Helper to check charitable intent
+// Check charitable intent
 function hasCharitableIntent(profile: UserProfile): boolean {
   return profile.charitableGiving !== undefined && profile.charitableGiving !== 'none';
 }
 
-// Helper to calculate priority boost from retirement tier
+// Get retirement tier index (higher = more assets)
+function getRetirementTierIndex(tier: RetirementRange): number {
+  return RETIREMENT_TIER_ORDER.indexOf(tier);
+}
+
+// Get real estate tier index (higher = more equity)
+function getRealEstateTierIndex(tier: RealEstateRange): number {
+  return REAL_ESTATE_TIER_ORDER.indexOf(tier);
+}
+
+// Check if retirement tier is below threshold
+function isRetirementBelowTier(profile: UserProfile, threshold: RetirementRange): boolean {
+  return getRetirementTierIndex(profile.retirementRange) < getRetirementTierIndex(threshold);
+}
+
+// Check if real estate tier is below threshold
+function isRealEstateBelowTier(profile: UserProfile, threshold: RealEstateRange): boolean {
+  return getRealEstateTierIndex(profile.realEstateRange) < getRealEstateTierIndex(threshold);
+}
+
+// Calculate priority boost from retirement tier
 function getRetirementPriorityBoost(profile: UserProfile, priorityTiers?: RetirementRange[]): number {
   if (!priorityTiers) return 0;
   if (priorityTiers.includes(profile.retirementRange)) {
-    // Higher tiers get more boost
-    const tierOrder: RetirementRange[] = ['<250k', '250k-500k', '500k-1m', '1m-2.5m', '2.5m-5m', '>5m'];
-    const tierIndex = tierOrder.indexOf(profile.retirementRange);
+    const tierIndex = getRetirementTierIndex(profile.retirementRange);
     return tierIndex * 5; // 0, 5, 10, 15, 20, 25
   }
   return 0;
 }
 
-// Helper to calculate priority boost from real estate tier
+// Calculate priority boost from real estate tier
 function getRealEstatePriorityBoost(profile: UserProfile, priorityTiers?: RealEstateRange[]): number {
   if (!priorityTiers) return 0;
   if (priorityTiers.includes(profile.realEstateRange)) {
-    const tierOrder: RealEstateRange[] = ['none', '<250k', '250k-750k', '750k-2m', '>2m'];
-    const tierIndex = tierOrder.indexOf(profile.realEstateRange);
+    const tierIndex = getRealEstateTierIndex(profile.realEstateRange);
     return tierIndex * 5;
   }
   return 0;
+}
+
+// Check suppression conditions
+function shouldSuppressStrategy(profile: UserProfile, conditions?: SuppressionConditions, complexity?: 'high' | 'medium' | 'low'): boolean {
+  if (!conditions && !complexity) return false;
+  
+  // High-complexity strategies suppressed for <$250k retirement
+  if (complexity === 'high' && profile.retirementRange === '<250k') {
+    return true;
+  }
+  
+  if (conditions) {
+    // Suppress if below retirement tier threshold
+    if (conditions.suppressBelowRetirementTier && 
+        isRetirementBelowTier(profile, conditions.suppressBelowRetirementTier)) {
+      return true;
+    }
+    
+    // Suppress if below real estate tier threshold
+    if (conditions.suppressBelowRealEstateTier && 
+        isRealEstateBelowTier(profile, conditions.suppressBelowRealEstateTier)) {
+      return true;
+    }
+    
+    // Suppress if no real estate
+    if (conditions.suppressIfNoRealEstate && profile.realEstateRange === 'none') {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+// Compute dynamic impact based on asset scale
+function computeImpact(
+  baseImpact: 'high' | 'medium' | 'low',
+  profile: UserProfile,
+  strategy: Strategy
+): 'high' | 'medium' | 'low' {
+  const retirementIndex = getRetirementTierIndex(profile.retirementRange);
+  const realEstateIndex = getRealEstateTierIndex(profile.realEstateRange);
+  
+  // Impact adjustments based on retirement tier
+  // <$250k: Reduce impact by one level (high → medium → low)
+  // $250k-$1M: Keep base impact
+  // $1M+: Increase urgency for pre-RMD strategies (but don't change impact label)
+  
+  if (profile.retirementRange === '<250k') {
+    // Reduce impact for lower balances
+    if (baseImpact === 'high') return 'medium';
+    if (baseImpact === 'medium') return 'low';
+  }
+  
+  // For real estate strategies, adjust based on real estate tier
+  if (strategy.primaryTriggers.requiresRentalRealEstate) {
+    if (realEstateIndex <= 1) { // none or <$250k
+      if (baseImpact === 'high') return 'medium';
+      if (baseImpact === 'medium') return 'low';
+    } else if (realEstateIndex === 2) { // $250k-$750k
+      if (baseImpact === 'high') return 'medium'; // Show as medium, not high
+    }
+  }
+  
+  return baseImpact;
+}
+
+// Compute urgency level based on asset scale
+function computeUrgencyLevel(
+  profile: UserProfile,
+  strategy: Strategy,
+  flags: TransitionYearFlags
+): 'worth-deeper-review' | 'worth-considering' | 'worth-noting' {
+  const retirementIndex = getRetirementTierIndex(profile.retirementRange);
+  
+  // $1M+ retirement: "worth deeper review" for pre-RMD and conversion strategies
+  if (retirementIndex >= 3) { // $1M+
+    if (strategy.category === 'withdrawal' || 
+        strategy.id === 'roth-conversion-window' ||
+        strategy.id === 'rmd-planning') {
+      return 'worth-deeper-review';
+    }
+  }
+  
+  // Transition year strategies get elevated urgency
+  if (flags.isTransitionYear && strategy.transitionYearPriority && strategy.transitionYearPriority > 70) {
+    return 'worth-deeper-review';
+  }
+  
+  // $250k-$1M: "worth considering"
+  if (retirementIndex >= 1 && retirementIndex <= 2) {
+    return 'worth-considering';
+  }
+  
+  // <$250k: "worth noting" (awareness level)
+  if (retirementIndex === 0) {
+    return 'worth-noting';
+  }
+  
+  return 'worth-considering';
 }
 
 export const strategies: Strategy[] = [
@@ -215,9 +341,14 @@ export const strategies: Strategy[] = [
     whyForYou: 'QLACs can be one tool in managing RMD exposure for larger balances.',
     impact: 'low',
     category: 'withdrawal',
+    complexity: 'high',
     primaryTriggers: {
       minAge: 65,
       requiresPreTaxRetirement: true
+    },
+    suppressionConditions: {
+      // QLACs only practical with meaningful IRA balances
+      suppressBelowRetirementTier: '500k-1m'
     },
     priorityModifiers: {
       higherPriorityRetirementTiers: ['1m-2.5m', '2.5m-5m', '>5m']
@@ -266,8 +397,13 @@ export const strategies: Strategy[] = [
     whyForYou: 'Your charitable intent combined with appreciated assets makes this worth exploring.',
     impact: 'medium',
     category: 'giving',
+    complexity: 'high',
     primaryTriggers: {
       requiresCharitableIntent: true
+    },
+    suppressionConditions: {
+      // CRTs only make sense with meaningful assets
+      suppressBelowRetirementTier: '500k-1m'
     },
     priorityModifiers: {
       higherPriorityRetirementTiers: ['2.5m-5m', '>5m'],
@@ -288,6 +424,10 @@ export const strategies: Strategy[] = [
     category: 'general',
     primaryTriggers: {
       requiresRentalRealEstate: true
+    },
+    suppressionConditions: {
+      // 1031 exchanges impractical for very small equity
+      suppressBelowRealEstateTier: '250k-750k'
     },
     priorityModifiers: {
       higherPriorityRealEstateTiers: ['750k-2m', '>2m'],
@@ -386,7 +526,7 @@ export const strategies: Strategy[] = [
   }
 ];
 
-export function matchStrategies(profile: UserProfile): Strategy[] {
+export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
   const flags = computeTransitionFlags(profile);
   const age = profile.age;
   
@@ -395,6 +535,13 @@ export function matchStrategies(profile: UserProfile): Strategy[] {
     
     // Suppress during unemployment if flagged
     if (strategy.suppressDuringUnemployment && flags.anyoneUnemployed) {
+      return false;
+    }
+    
+    // ========================================
+    // SUPPRESSION CHECKS - Asset-based practicality
+    // ========================================
+    if (shouldSuppressStrategy(profile, strategy.suppressionConditions, strategy.complexity)) {
       return false;
     }
     
@@ -449,9 +596,9 @@ export function matchStrategies(profile: UserProfile): Strategy[] {
   });
 
   // ========================================
-  // CALCULATE PRIORITY SCORES & SORT
+  // CALCULATE COMPUTED VALUES & SORT
   // ========================================
-  const scoredStrategies = matchedStrategies.map(strategy => {
+  const scoredStrategies: MatchedStrategy[] = matchedStrategies.map(strategy => {
     let priorityScore = 0;
     const modifiers = strategy.priorityModifiers;
     
@@ -460,9 +607,10 @@ export function matchStrategies(profile: UserProfile): Strategy[] {
       priorityScore += strategy.transitionYearPriority;
     }
     
-    // Impact-based score
+    // Impact-based score (using computed impact)
+    const computedImpactValue = computeImpact(strategy.impact, profile, strategy);
     const impactScore = { high: 30, medium: 20, low: 10 };
-    priorityScore += impactScore[strategy.impact];
+    priorityScore += impactScore[computedImpactValue];
     
     if (modifiers) {
       // Retirement tier boost
@@ -484,13 +632,21 @@ export function matchStrategies(profile: UserProfile): Strategy[] {
       }
     }
     
-    return { strategy, priorityScore };
+    // Compute urgency level
+    const urgencyLevel = computeUrgencyLevel(profile, strategy, flags);
+    
+    return {
+      ...strategy,
+      computedImpact: computedImpactValue,
+      urgencyLevel,
+      priorityScore
+    };
   });
 
   // Sort by priority score (highest first)
   scoredStrategies.sort((a, b) => b.priorityScore - a.priorityScore);
 
-  return scoredStrategies.map(s => s.strategy);
+  return scoredStrategies;
 }
 
 // Generate cautionary notes based on profile

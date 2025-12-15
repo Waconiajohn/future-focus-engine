@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { StrategyCard } from "@/components/StrategyCard";
 import { RotateCcw, Shield, AlertCircle } from "lucide-react";
-import { Strategy, UserProfile, computeTransitionFlags } from "@/types/persona";
+import { MatchedStrategy, UserProfile, computeTransitionFlags } from "@/types/persona";
 import { getTransitionYearCautions } from "@/data/strategies";
 
 interface ResultsStepProps {
   profile: UserProfile;
-  strategies: Strategy[];
+  strategies: MatchedStrategy[];
   onRestart: () => void;
 }
 
