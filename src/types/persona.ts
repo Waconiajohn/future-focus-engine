@@ -111,11 +111,42 @@ export interface Strategy {
   whyForYou: string;
   impact: 'high' | 'medium' | 'low';
   category: 'timing' | 'structure' | 'withdrawal' | 'giving' | 'general';
-  requiredConditions: StrategyConditions;
-  transitionYearPriority?: number; // Higher = more relevant during transition years
-  suppressDuringUnemployment?: boolean; // Hide if unemployed
+  // Primary triggers - ALL must be true for strategy to appear
+  primaryTriggers: PrimaryTriggers;
+  // Modifiers - affect priority/urgency, not eligibility
+  priorityModifiers?: PriorityModifiers;
+  transitionYearPriority?: number;
+  suppressDuringUnemployment?: boolean;
 }
 
+// PRIMARY TRIGGERS - Hard requirements. If ANY fails, strategy NEVER appears.
+export interface PrimaryTriggers {
+  minAge?: number;
+  maxAge?: number;
+  maritalStatus?: MaritalStatus[];
+  // Behavioral/situational triggers
+  requiresPreTaxRetirement?: boolean; // Has meaningful pre-tax accounts
+  requiresCharitableIntent?: boolean; // charitableGiving > 'none'
+  requiresEmployerStock?: boolean;
+  requiresRentalRealEstate?: boolean;
+  requiresBusinessOwnership?: boolean;
+  requiresTransitionYear?: boolean;
+  requiresLowerIncome?: boolean;
+  employmentStatus?: EmploymentStatus[];
+}
+
+// PRIORITY MODIFIERS - Affect sorting/urgency, never eligibility
+export interface PriorityModifiers {
+  // Higher balances = higher priority (not a requirement)
+  higherPriorityRetirementTiers?: RetirementRange[];
+  higherPriorityRealEstateTiers?: RealEstateRange[];
+  // Boost priority for these age ranges
+  priorityAgeRange?: { min: number; max: number };
+  // Base priority boost
+  basePriorityBoost?: number;
+}
+
+// Legacy interface for backward compatibility during migration
 export interface StrategyConditions {
   minAge?: number;
   maxAge?: number;
