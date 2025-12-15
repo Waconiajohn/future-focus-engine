@@ -1,9 +1,9 @@
-import { Strategy } from "@/types/persona";
+import { MatchedStrategy } from "@/types/persona";
 import { cn } from "@/lib/utils";
 import { TrendingUp, Minus, TrendingDown, Clock } from "lucide-react";
 
 interface StrategyCardProps {
-  strategy: Strategy;
+  strategy: MatchedStrategy;
   index: number;
 }
 
@@ -33,10 +33,27 @@ const categoryLabels: Record<string, string> = {
   general: "General Planning"
 };
 
+const urgencyLabels: Record<string, { label: string; className: string }> = {
+  'worth-deeper-review': {
+    label: 'Worth Deeper Review',
+    className: 'text-sage font-medium'
+  },
+  'worth-considering': {
+    label: 'Worth Considering',
+    className: 'text-gold font-medium'
+  },
+  'worth-noting': {
+    label: 'Worth Noting',
+    className: 'text-muted-foreground'
+  }
+};
+
 export function StrategyCard({ strategy, index }: StrategyCardProps) {
-  const impact = impactConfig[strategy.impact];
+  // Use computedImpact for display
+  const impact = impactConfig[strategy.computedImpact];
   const Icon = impact.icon;
   const isTimingSensitive = strategy.category === 'timing' || (strategy.transitionYearPriority && strategy.transitionYearPriority > 50);
+  const urgency = urgencyLabels[strategy.urgencyLevel];
 
   return (
     <div
@@ -53,6 +70,10 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
         </p>
         <p className="text-sm text-muted-foreground leading-relaxed">
           {strategy.whyForYou}
+        </p>
+        {/* Urgency level indicator */}
+        <p className={cn("text-xs mt-2", urgency.className)}>
+          {urgency.label}
         </p>
       </div>
 
@@ -84,8 +105,13 @@ export function StrategyCard({ strategy, index }: StrategyCardProps) {
       </div>
       
       {/* Plain-English Explanation */}
-      <p className="text-foreground/80 leading-relaxed text-sm">
+      <p className="text-foreground/80 leading-relaxed text-sm mb-4">
         {strategy.description}
+      </p>
+
+      {/* Professional Coordination Footer */}
+      <p className="text-xs text-muted-foreground/70 italic pt-3 border-t border-border/30">
+        Professional coordination required
       </p>
     </div>
   );

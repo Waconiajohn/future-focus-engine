@@ -115,8 +115,19 @@ export interface Strategy {
   primaryTriggers: PrimaryTriggers;
   // Modifiers - affect priority/urgency, not eligibility
   priorityModifiers?: PriorityModifiers;
+  // Suppression conditions - strategy hidden if ANY condition met
+  suppressionConditions?: SuppressionConditions;
   transitionYearPriority?: number;
   suppressDuringUnemployment?: boolean;
+  // Complexity flag for suppression at lower tiers
+  complexity?: 'high' | 'medium' | 'low';
+}
+
+// Matched strategy with computed values
+export interface MatchedStrategy extends Strategy {
+  computedImpact: 'high' | 'medium' | 'low';
+  urgencyLevel: 'worth-deeper-review' | 'worth-considering' | 'worth-noting';
+  priorityScore: number;
 }
 
 // PRIMARY TRIGGERS - Hard requirements. If ANY fails, strategy NEVER appears.
@@ -133,6 +144,16 @@ export interface PrimaryTriggers {
   requiresTransitionYear?: boolean;
   requiresLowerIncome?: boolean;
   employmentStatus?: EmploymentStatus[];
+}
+
+// SUPPRESSION CONDITIONS - Strategy hidden if ANY condition is met
+export interface SuppressionConditions {
+  // Suppress if retirement accounts below these tiers
+  suppressBelowRetirementTier?: RetirementRange;
+  // Suppress if real estate below these tiers
+  suppressBelowRealEstateTier?: RealEstateRange;
+  // Suppress if no real estate
+  suppressIfNoRealEstate?: boolean;
 }
 
 // PRIORITY MODIFIERS - Affect sorting/urgency, never eligibility

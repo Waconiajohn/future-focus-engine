@@ -13,7 +13,7 @@ import {
   RealEstateRange, 
   EmploymentStatus, 
   PersonaStory, 
-  Strategy,
+  MatchedStrategy,
   UnemploymentDetails,
   CharitableRange
 } from "@/types/persona";
@@ -24,7 +24,7 @@ export default function Index() {
   const [currentStep, setCurrentStep] = useState<Step>('intro');
   const [profile, setProfile] = useState<Partial<UserProfile>>({});
   const [matchedStories, setMatchedStories] = useState<PersonaStory[]>([]);
-  const [matchedStrategies, setMatchedStrategies] = useState<Strategy[]>([]);
+  const [matchedStrategies, setMatchedStrategies] = useState<MatchedStrategy[]>([]);
 
   const handleStart = () => {
     setCurrentStep('persona');
