@@ -40,14 +40,14 @@ export function EnhancedStrategyCard({
 
   return (
     <Card className={cn(
-      "overflow-hidden border transition-all duration-300",
+      "overflow-hidden border transition-all duration-300 group",
       isExpanded 
         ? "border-primary/30 shadow-lg ring-1 ring-primary/10" 
-        : "border-border/50 shadow-sm hover:shadow-md hover:border-border"
+        : "border-border/50 shadow-sm hover:shadow-md hover:border-primary/20"
     )}>
       {/* Header - Always Visible */}
       <div
-        className="p-5 cursor-pointer"
+        className="p-5 cursor-pointer select-none"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex justify-between items-start gap-4">
@@ -69,12 +69,18 @@ export function EnhancedStrategyCard({
               {whatItIs.length > 150 ? whatItIs.slice(0, 150) + "..." : whatItIs}
             </p>
 
-            {/* Personalized Savings Preview */}
+            {/* Estimated Savings Preview */}
             {!isExpanded && (
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">
-                  Your estimated savings: {formatEstimate(personalizedEstimate)}
+              <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border/50 group-hover:border-primary/30 transition-colors">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">
+                    Estimated savings: {formatEstimate(personalizedEstimate)}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  Tap for details
+                  <ChevronDown className="h-3 w-3" />
                 </span>
               </div>
             )}
@@ -138,12 +144,12 @@ export function EnhancedStrategyCard({
 
                   {/* Key Details Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Personalized Savings */}
+                    {/* Estimated Savings */}
                     <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
                       <div className="flex items-center gap-2 mb-2">
                         <TrendingUp className="h-4 w-4 text-primary" />
                         <h4 className="text-sm font-semibold text-foreground">
-                          Your Estimated Savings
+                          Estimated Savings
                         </h4>
                       </div>
                       <p className="text-lg font-bold text-primary">
