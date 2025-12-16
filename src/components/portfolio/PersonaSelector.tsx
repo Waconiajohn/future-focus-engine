@@ -146,8 +146,9 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
                   {[
                     { val: "Employed", txt: "Employed (W-2)", desc: "Standard employment" },
                     { val: "Consulting", txt: "Self-Employed / Consulting", desc: "1099 or Business Owner" },
-                    { val: "Severance", txt: "Recently Separated / Severance", desc: "Transitioning jobs" },
-                    { val: "Unemployed", txt: "Unemployed", desc: "No earned income" },
+                    { val: "Severance", txt: "Recently Laid Off (with Severance)", desc: "Within last 6 months, receiving severance" },
+                    { val: "RecentlyUnemployed", txt: "Recently Laid Off (no Severance)", desc: "Within last 6 months, no severance package" },
+                    { val: "Unemployed", txt: "Long-term Unemployed", desc: "Unemployed 6+ months" },
                   ].map((opt) => (
                     <div
                       key={opt.val}
@@ -185,8 +186,9 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
                   {[
                     { val: "Employed", txt: "Employed (W-2)", desc: "Standard employment" },
                     { val: "Consulting", txt: "Self-Employed / Consulting", desc: "1099 or Business Owner" },
-                    { val: "Severance", txt: "Recently Separated / Severance", desc: "Transitioning jobs" },
-                    { val: "Unemployed", txt: "Unemployed", desc: "No earned income" },
+                    { val: "Severance", txt: "Recently Laid Off (with Severance)", desc: "Within last 6 months, receiving severance" },
+                    { val: "RecentlyUnemployed", txt: "Recently Laid Off (no Severance)", desc: "Within last 6 months, no severance package" },
+                    { val: "Unemployed", txt: "Long-term Unemployed", desc: "Unemployed 6+ months" },
                   ].map((opt) => (
                     <div
                       key={opt.val}
