@@ -108,10 +108,10 @@ export function TaxOnboarding() {
           <div className="mt-8 animate-fade-in">
             <div className="rounded-lg bg-surface border border-border p-8 shadow-subtle mb-8">
               <div className="text-xs font-semibold tracking-wide text-textMuted">PROFILE</div>
-              <h2 className="mt-2 text-3xl font-semibold leading-tight text-textPrimary">
+              <h2 className="mt-2 text-3xl lg:text-4xl xl:text-5xl font-semibold leading-tight text-textPrimary">
                 Pick the options that best match your situation
               </h2>
-              <p className="mt-3 text-lg leading-normal text-textSecondary">
+              <p className="mt-3 text-lg lg:text-xl leading-normal text-textSecondary">
                 These inputs help show stories and strategies that may be worth discussing.
               </p>
             </div>
@@ -144,10 +144,10 @@ export function TaxOnboarding() {
             <section className="space-y-6">
               <div className="rounded-lg bg-surface border border-border p-8 shadow-subtle">
                 <div className="text-xs font-semibold tracking-wide text-textMuted">RESULTS</div>
-                <h1 className="mt-2 text-3xl font-semibold leading-tight text-textPrimary">
+                <h1 className="mt-2 text-3xl lg:text-4xl xl:text-5xl font-semibold leading-tight text-textPrimary">
                   Stories and opportunities worth discussing
                 </h1>
-                <p className="mt-3 text-lg leading-normal text-textSecondary">
+                <p className="mt-3 text-lg lg:text-xl leading-normal text-textSecondary">
                   This view highlights tax-planning topics that may be relevant based on your situation.
                   It does not provide advice or savings estimates.
                 </p>
@@ -164,8 +164,8 @@ export function TaxOnboarding() {
             <section className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-textPrimary">Opportunities</h2>
-                  <p className="mt-1 text-base text-textSecondary">
+                  <h2 className="text-2xl lg:text-3xl font-bold text-textPrimary">Opportunities</h2>
+                  <p className="mt-1 text-base lg:text-lg text-textSecondary">
                     Educational signals to prepare for professional conversations.
                   </p>
                 </div>
