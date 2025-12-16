@@ -95,7 +95,7 @@ export function TaxOnboarding() {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="rounded-md bg-primary px-6 py-3 text-base font-semibold text-white hover:opacity-95 transition"
+                className="rounded-md bg-primary px-6 py-3 text-xl font-semibold text-white hover:opacity-95 transition"
               >
                 Continue
               </button>
@@ -193,7 +193,7 @@ export function TaxOnboarding() {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="rounded-md border border-border bg-surface px-5 py-3 text-base font-semibold text-textPrimary hover:bg-surfaceMuted transition"
+                className="rounded-md border border-border bg-surface px-5 py-3 text-xl font-semibold text-textPrimary hover:bg-surfaceMuted transition"
               >
                 Edit selections
               </button>

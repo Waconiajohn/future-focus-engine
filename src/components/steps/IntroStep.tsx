@@ -18,7 +18,7 @@ export function IntroStep({ onStart }: IntroStepProps) {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-12">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto text-[clamp(1.125rem,1.4vw,1.5rem)]">
           {/* Hero Section */}
           <div className="text-center mb-12">
             <h1 className="font-serif font-semibold text-foreground mb-6 leading-tight opacity-0 animate-fade-up text-[clamp(2.5rem,5vw,5rem)]">
@@ -35,14 +35,14 @@ export function IntroStep({ onStart }: IntroStepProps) {
           {/* Three Costly Blunders Section */}
           <div className="bg-card/80 rounded-2xl p-6 sm:p-8 mb-12 border border-border/50 opacity-0 animate-fade-up animation-delay-150">
             <div className="text-center mb-6">
-              <span className="inline-flex items-center gap-2 px-3 py-1 bg-muted text-muted-foreground rounded-full text-sm font-medium mb-3">
-                <AlertTriangle className="h-4 w-4" />
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-muted text-muted-foreground rounded-full text-base font-medium mb-3">
+                <AlertTriangle className="h-5 w-5" />
                 Common Retirement Tax Mistakes
               </span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-foreground">
+              <h2 className="font-serif font-semibold text-foreground text-[clamp(2rem,3vw,3rem)]">
                 Three Costly Blunders That Can Spoil Your Retirement
               </h2>
-              <p className="text-muted-foreground mt-2 text-sm">
+              <p className="text-muted-foreground mt-3 text-[clamp(1.125rem,1.6vw,1.5rem)]">
                 Most retirees are shocked to learn that taxes can be their largest expense in retirement.
               </p>
             </div>
@@ -54,12 +54,12 @@ export function IntroStep({ onStart }: IntroStepProps) {
                   <span className="text-primary font-bold">1</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">No Withdrawal Plan</h3>
-                  <p className="text-sm text-muted-foreground">
-                    You had a strategy to save, but no plan for tax-efficient withdrawals. Without one, 
+                  <h3 className="font-semibold text-foreground mb-1 text-[clamp(1.25rem,1.8vw,1.75rem)]">No Withdrawal Plan</h3>
+                  <p className="text-muted-foreground text-[clamp(1.125rem,1.5vw,1.5rem)]">
+                    You had a strategy to save, but no plan for tax-efficient withdrawals. Without one,
                     you could pay significantly more in taxes than necessary once RMDs and large withdrawals kick in.
                   </p>
-                  <p className="text-xs text-primary font-medium mt-2">
+                  <p className="text-primary font-medium mt-3 text-[clamp(1rem,1.25vw,1.25rem)]">
                     💡 One couple saved ~$790,000 in lifetime taxes by implementing Roth conversions and timing distributions strategically.
                   </p>
                 </div>
@@ -71,12 +71,12 @@ export function IntroStep({ onStart }: IntroStepProps) {
                   <Clock className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Ignoring RMD "Tax Bombs"</h3>
-                  <p className="text-sm text-muted-foreground">
-                    At age 73, the IRS forces Required Minimum Distributions from traditional retirement accounts. 
+                  <h3 className="font-semibold text-foreground mb-1 text-[clamp(1.25rem,1.8vw,1.75rem)]">Ignoring RMD "Tax Bombs"</h3>
+                  <p className="text-muted-foreground text-[clamp(1.125rem,1.5vw,1.5rem)]">
+                    At age 73, the IRS forces Required Minimum Distributions from traditional retirement accounts.
                     These can push you into higher brackets and spike taxes on Social Security and Medicare premiums.
                   </p>
-                  <p className="text-xs text-primary font-medium mt-2">
+                  <p className="text-primary font-medium mt-3 text-[clamp(1rem,1.25vw,1.25rem)]">
                     💡 One couple avoided ~$490,000 in taxes using QCDs and partial Roth conversions to manage RMDs.
                   </p>
                 </div>
@@ -88,12 +88,12 @@ export function IntroStep({ onStart }: IntroStepProps) {
                   <TrendingUp className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Failing to Plan for Higher Rates</h3>
-                  <p className="text-sm text-muted-foreground">
-                    We are in a historically low tax regime scheduled to sunset. Many experts anticipate higher 
+                  <h3 className="font-semibold text-foreground mb-1 text-[clamp(1.25rem,1.8vw,1.75rem)]">Failing to Plan for Higher Rates</h3>
+                  <p className="text-muted-foreground text-[clamp(1.125rem,1.5vw,1.5rem)]">
+                    We are in a historically low tax regime scheduled to sunset. Many experts anticipate higher
                     tax rates ahead. Without preparation, future hikes could delay retirement or force lifestyle cuts.
                   </p>
-                  <p className="text-xs text-primary font-medium mt-2">
+                  <p className="text-primary font-medium mt-3 text-[clamp(1rem,1.25vw,1.25rem)]">
                     💡 One family saved ~$225,000 through proactive tax optimization, allowing them to retire on time.
                   </p>
                 </div>
@@ -110,10 +110,10 @@ export function IntroStep({ onStart }: IntroStepProps) {
 
           {/* Why This Is Often Overlooked */}
           <div className="bg-card/50 rounded-2xl p-6 mb-12 text-left opacity-0 animate-fade-up animation-delay-200">
-            <h2 className="font-serif text-xl font-semibold text-foreground mb-4">
+            <h2 className="font-serif font-semibold text-foreground mb-4 text-[clamp(1.75rem,2.5vw,2.5rem)]">
               Why This Is Often Overlooked
             </h2>
-            <div className="space-y-3 text-foreground/80 text-sm leading-relaxed">
+            <div className="space-y-3 text-foreground/80 leading-relaxed text-[clamp(1.125rem,1.5vw,1.5rem)]">
               <p>
                 Most financial advisory relationships are built around investment management, not coordinated, multi-year tax planning. That isn't a failure—it's how the industry is structured.
               </p>
@@ -135,8 +135,8 @@ export function IntroStep({ onStart }: IntroStepProps) {
           {/* What This Does / Doesn't Do */}
           <div className="grid sm:grid-cols-2 gap-6 mb-12 opacity-0 animate-fade-up animation-delay-200">
             <div className="bg-sage-light/30 rounded-xl p-6">
-              <h2 className="font-serif font-semibold text-lg mb-3 text-sage">What This Tool Does</h2>
-              <ul className="space-y-2 text-sm text-foreground/80">
+              <h2 className="font-serif font-semibold mb-3 text-sage text-[clamp(1.5rem,2vw,2rem)]">What This Tool Does</h2>
+              <ul className="space-y-2 text-foreground/80 text-[clamp(1.125rem,1.4vw,1.5rem)]">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-sage mt-2 shrink-0" />
                   Identifies tax-planning concepts that may be relevant based on your situation
@@ -152,8 +152,8 @@ export function IntroStep({ onStart }: IntroStepProps) {
               </ul>
             </div>
             <div className="bg-muted/50 rounded-xl p-6">
-              <h2 className="font-serif font-semibold text-lg mb-3 text-muted-foreground">What This Tool Doesn't Do</h2>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h2 className="font-serif font-semibold mb-3 text-muted-foreground text-[clamp(1.5rem,2vw,2rem)]">What This Tool Doesn't Do</h2>
+              <ul className="space-y-2 text-muted-foreground text-[clamp(1.125rem,1.4vw,1.5rem)]">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-warm-gray mt-2 shrink-0" />
                   Provide tax, legal, or investment advice
