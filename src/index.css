@@ -94,13 +94,23 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-    /* Subtle gradient background like Origin */
-     background: linear-gradient(
-      135deg,
-      hsl(222 47% 6%) 0%,
-      hsl(222 47% 8%) 50%,
-      hsl(222 47% 6%) 100%
-    );
+    /* Use theme tokens so text/background always have correct contrast */
+    background: radial-gradient(
+        1200px 800px at 20% 10%,
+        hsl(var(--primary) / 0.10) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        900px 700px at 85% 20%,
+        hsl(var(--chart-4) / 0.08) 0%,
+        transparent 50%
+      ),
+      linear-gradient(
+        135deg,
+        hsl(var(--background)) 0%,
+        hsl(var(--muted)) 60%,
+        hsl(var(--background)) 100%
+      );
     min-height: 100vh;
     font-size: 17px;
     line-height: 1.6;
@@ -412,10 +422,24 @@
     animation: slideUp 0.4s ease-out;
   }
 
+  /* Used throughout onboarding steps */
+  .animate-fade-up {
+    animation: fade-in-up 0.4s ease-out forwards;
+  }
+
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-150 { animation-delay: 150ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-250 { animation-delay: 250ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-350 { animation-delay: 350ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-450 { animation-delay: 450ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+
   .animate-pulse-subtle {
     animation: pulseSublte 2s ease-in-out infinite;
   }
-
   /* Card entrance with stagger */
   .animate-card-1 { animation: cardEntrance 0.5s ease-out 0.0s forwards; opacity: 0; }
   .animate-card-2 { animation: cardEntrance 0.5s ease-out 0.1s forwards; opacity: 0; }
