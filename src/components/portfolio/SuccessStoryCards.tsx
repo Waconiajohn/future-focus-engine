@@ -15,7 +15,7 @@ interface SuccessStory {
 const SUCCESS_STORIES: SuccessStory[] = [
   {
     id: "roth-conversion",
-    names: "Michael & Karen",
+    names: "Marcus & Priya",
     situation: "Retired couple, ages 62 & 60, with $1.1M in traditional IRAs",
     strategy: "Strategic Roth Conversions",
     savings: "$790,000",
@@ -25,7 +25,7 @@ const SUCCESS_STORIES: SuccessStory[] = [
   },
   {
     id: "qcd-qlac",
-    names: "David & Patricia",
+    names: "Terrence & Yuki",
     situation: "Retired couple, ages 74 & 72, facing large RMDs on $800k IRA",
     strategy: "QCDs + Partial QLAC",
     savings: "$490,000",
@@ -35,7 +35,7 @@ const SUCCESS_STORIES: SuccessStory[] = [
   },
   {
     id: "early-conversion",
-    names: "James & Linda",
+    names: "Wei & Gabriela",
     situation: "Pre-retirees, ages 58 & 56, worried about future tax rates",
     strategy: "Early Roth Conversions + Tax-Loss Harvesting",
     savings: "$225,000",
@@ -45,7 +45,7 @@ const SUCCESS_STORIES: SuccessStory[] = [
   },
   {
     id: "real-estate",
-    names: "Robert & Susan",
+    names: "Kwame & Ingrid",
     situation: "Real estate investors, ages 65 & 63, selling rental portfolio",
     strategy: "1031 Exchange + Installment Sale",
     savings: "$340,000",
