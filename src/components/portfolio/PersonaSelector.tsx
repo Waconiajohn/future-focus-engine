@@ -21,7 +21,7 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
   // State for persona
   const [ageBand, setAgeBand] = useState<AgeBand | null>(null);
   const [maritalStatus, setMaritalStatus] = useState<MaritalStatus | null>(null);
-  const [employment, setEmployment] = useState<EmploymentStatus>("Employed");
+  const [employment, setEmployment] = useState<EmploymentStatus>("Unemployed");
   const [spouseEmployment, setSpouseEmployment] = useState<EmploymentStatus>("Employed");
   const [retirementRange, setRetirementRange] = useState<RetirementRange | null>(null);
   const [realEstate, setRealEstate] = useState<RealEstateProfile>("None");
@@ -147,7 +147,7 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
                     { val: "Employed", txt: "Employed (W-2)", desc: "Standard employment" },
                     { val: "Consulting", txt: "Self-Employed / Consulting", desc: "1099 or Business Owner" },
                     { val: "Severance", txt: "Recently Separated / Severance", desc: "Transitioning jobs" },
-                    { val: "Unemployed", txt: "Unemployed / Retired", desc: "No earned income" },
+                    { val: "Unemployed", txt: "Unemployed", desc: "No earned income" },
                   ].map((opt) => (
                     <div
                       key={opt.val}
@@ -186,7 +186,7 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
                     { val: "Employed", txt: "Employed (W-2)", desc: "Standard employment" },
                     { val: "Consulting", txt: "Self-Employed / Consulting", desc: "1099 or Business Owner" },
                     { val: "Severance", txt: "Recently Separated / Severance", desc: "Transitioning jobs" },
-                    { val: "Unemployed", txt: "Unemployed / Retired", desc: "No earned income" },
+                    { val: "Unemployed", txt: "Unemployed", desc: "No earned income" },
                   ].map((opt) => (
                     <div
                       key={opt.val}
