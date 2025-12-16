@@ -23,7 +23,10 @@ const evaluatorLabels: Record<string, string> = {
   'CFP': 'CFP',
   'Attorney': 'Estate Attorney',
   'CPA/CFP': 'CPA or CFP',
+  'CPA + CFP': 'CPA or CFP',
+  'Advisor / CPA': 'CPA or CFP',
   'CPA/Attorney': 'CPA or Estate Attorney',
+  'CPA + Estate Attorney': 'CPA or Estate Attorney',
   'CFP/Attorney': 'CFP or Estate Attorney',
   'CPA/CFP/Attorney': 'CPA, CFP, or Estate Attorney'
 };

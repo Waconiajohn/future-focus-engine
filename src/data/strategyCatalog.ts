@@ -9,7 +9,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Periods between roles or early retirement can temporarily reduce taxable income.\nThat window may support multi-year tax-bucket planning.",
     decisionWindow: "Often strongest before RMD years and Medicare thresholds.",
-    professional: "CPA + CFP",
+    professional: "CPA/CFP",
     impact: "Material",
     cta: "Worth discussing",
     cpaSummary:
@@ -22,7 +22,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Some households exceed direct Roth contribution limits.\nA structured nondeductible IRA + conversion may be relevant.",
     decisionWindow: "Best when pro-rata IRA aggregation is manageable.",
-    professional: "CPA",
+    professional: "CPA/CFP",
     impact: "Potential",
     cta: "Worth discussing",
     cpaSummary:
@@ -35,7 +35,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Some employer plans allow after-tax contributions above deferral limits.\nIn-plan conversion or rollover may shift growth to Roth treatment.",
     decisionWindow: "Requires specific plan features (after-tax + conversion).",
-    professional: "CPA + CFP",
+    professional: "CPA/CFP",
     impact: "Material",
     cta: "Worth discussing",
     cpaSummary:
@@ -61,7 +61,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Certain IRA/plan assets may be allocated to a QLAC structure.\nThis can shift timing of required distributions within allowed limits.",
     decisionWindow: "Before/around RMD age; product and limit rules apply.",
-    professional: "CPA + CFP",
+    professional: "CPA/CFP",
     impact: "Advanced",
     cta: "Worth discussing",
     cpaSummary:
@@ -87,7 +87,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Holding certain assets in taxable vs retirement accounts can change tax friction.\nLocation choices can matter over long horizons.",
     decisionWindow: "Anytime; revisit during major allocation or life changes.",
-    professional: "Advisor / CPA",
+    professional: "CPA/CFP",
     impact: "Potential",
     cta: "Worth discussing",
     cpaSummary:
@@ -100,7 +100,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Down markets can generate capital losses in taxable accounts.\nLosses may offset gains and potentially reduce future taxes.",
     decisionWindow: "Most relevant during drawdowns and rebalancing cycles.",
-    professional: "Advisor / CPA",
+    professional: "CPA/CFP",
     impact: "Potential",
     cta: "Worth discussing",
     cpaSummary:
@@ -126,7 +126,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "For some brackets and states, municipal bonds may improve after-tax income.\nSuitability depends on yield, risk, and state rules.",
     decisionWindow: "When building or revising fixed income allocations.",
-    professional: "Advisor / CPA",
+    professional: "CPA/CFP",
     impact: "Potential",
     cta: "Worth discussing",
     cpaSummary:
@@ -178,7 +178,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Some donors use CRT structures to diversify appreciated assets and create income.\nThis requires careful legal and tax coordination.",
     decisionWindow: "Before a concentrated sale; requires trust setup.",
-    professional: "CPA + Estate Attorney",
+    professional: "CPA/Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
     cpaSummary:
@@ -217,7 +217,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Certain property owners explore conservation easements for charitable objectives.\nCompliance and valuation standards are strict.",
     decisionWindow: "Before development decisions; requires specialized counsel.",
-    professional: "CPA + Estate Attorney",
+    professional: "CPA/Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
     cpaSummary:
@@ -282,7 +282,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Some families use entities to coordinate control, gifting, and administration.\nTax and estate outcomes depend on details and valuation.",
     decisionWindow: "Before large gifts, liquidity events, or restructuring.",
-    professional: "CPA + Estate Attorney",
+    professional: "CPA/Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
     cpaSummary:
@@ -347,7 +347,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Insurance can be used for risk management and estate liquidity in certain plans.\nSuitability depends on objectives and costs.",
     decisionWindow: "Before major estate decisions; requires underwriting lead time.",
-    professional: "CPA + Estate Attorney",
+    professional: "CPA/Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
     cpaSummary:
@@ -360,7 +360,7 @@ export const STRATEGIES: Strategy[] = [
     scenario:
       "Some families plan for multi-generation wealth transfer structures.\nImplementation depends on exemptions, state law, and objectives.",
     decisionWindow: "Best evaluated during estate planning cycles.",
-    professional: "CPA + Estate Attorney",
+    professional: "CPA/Attorney",
     impact: "Advanced",
     cta: "Worth discussing",
     cpaSummary:

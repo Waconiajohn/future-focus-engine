@@ -4,15 +4,11 @@ export type ImpactLabel = "Potential" | "Material" | "Advanced" | "high" | "medi
 export type ProfessionalTag =
   | "CPA"
   | "CFP"
-  | "CPA + CFP"
   | "CPA/CFP"
-  | "Estate Attorney"
   | "Attorney"
-  | "CPA + Estate Attorney"
   | "CPA/Attorney"
   | "CFP/Attorney"
-  | "CPA/CFP/Attorney"
-  | "Advisor / CPA";
+  | "CPA/CFP/Attorney";
 
 export type AgeBand = "45-49" | "50-54" | "55-59" | "60-65" | "60-69" | "70+";
 
