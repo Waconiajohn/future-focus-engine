@@ -9,7 +9,8 @@ import {
   Users, 
   Lightbulb,
   CheckCircle2,
-  TrendingUp
+  TrendingUp,
+  FileText
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImpactBadge } from "./ImpactBadge";
@@ -17,26 +18,39 @@ import type { Strategy, RetirementRange } from "@/types/persona";
 import { getStrategyExample, type StrategyExample } from "@/data/strategy-examples";
 import { calculatePersonalizedEstimate, formatEstimate } from "@/lib/personalized-estimates";
 import { cn } from "@/lib/utils";
+import { AdvisorBriefingWizard } from "./AdvisorBriefingWizard";
 
 interface EnhancedStrategyCardProps {
   strategy: Strategy;
   defaultExpanded?: boolean;
   retirementRange?: RetirementRange;
   age?: number;
+  maritalStatus?: string;
+  employmentStatus?: string;
 }
 
 export function EnhancedStrategyCard({ 
   strategy, 
   defaultExpanded = false,
   retirementRange = "500k-1M",
-  age = 55
+  age = 55,
+  maritalStatus,
+  employmentStatus,
 }: EnhancedStrategyCardProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [wizardOpen, setWizardOpen] = useState(false);
   const example = getStrategyExample(strategy.id);
   const personalizedEstimate = calculatePersonalizedEstimate(strategy.id, retirementRange, age);
 
   const whatItIs = strategy.whatThisIs || strategy.description || "";
   const whyForYou = strategy.whyItAppears || strategy.whyForYou || strategy.triggerReason || "";
+
+  const clientProfile = {
+    age,
+    retirementRange,
+    maritalStatus,
+    employmentStatus,
+  };
 
   return (
     <Card className={cn(
@@ -194,7 +208,14 @@ export function EnhancedStrategyCard({
 
               {/* CTA */}
               <div className="pt-2 flex items-center gap-3">
-                <Button className="gap-2">
+                <Button 
+                  className="gap-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setWizardOpen(true);
+                  }}
+                >
+                  <FileText className="h-4 w-4" />
                   Discuss With Advisor
                 </Button>
                 <span className="text-xs text-muted-foreground">
@@ -205,6 +226,14 @@ export function EnhancedStrategyCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Advisor Briefing Wizard */}
+      <AdvisorBriefingWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        strategy={strategy}
+        clientProfile={clientProfile}
+      />
     </Card>
   );
 }
