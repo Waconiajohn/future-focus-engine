@@ -5,7 +5,7 @@ import { IntroStep } from "@/components/steps/IntroStep";
 import { StoryCard } from "@/components/portfolio/StoryCard";
 import { StrategyCard } from "@/components/portfolio/StrategyCard";
 import { DisclosureFooter } from "@/components/portfolio/DisclosureFooter";
-import { matchStrategies } from "@/data/strategies";
+import { matchStrategies } from "@/data/strategies-v2";
 import { personaToUserProfile } from "@/domain/tax/profileAdapter";
 import type { Persona, MatchedStrategy } from "@/types/persona";
 import { Shield, RefreshCw } from "lucide-react";
@@ -18,7 +18,6 @@ const Index = () => {
 
   const handlePersonaComplete = (newPersona: Persona) => {
     setPersona(newPersona);
-    // Convert Persona to UserProfile and use the rich matchStrategies engine
     const userProfile = personaToUserProfile(newPersona);
     const strategies = matchStrategies(userProfile);
     setMatchedStrategies(strategies);
@@ -32,56 +31,116 @@ const Index = () => {
     setPersona(null);
   };
 
-  // Helper to get 3 top stories based on matched strategies
-  const getTopStories = () => {
-    const stories: { title: string; insight: string; type: "tax" | "growth" | "income" }[] = [];
-    
-    // Check for high-impact tax strategies
-    const highImpactStrategies = matchedStrategies.filter(s => s.computedImpact === "high");
-    const taxStrategies = matchedStrategies.filter(s => 
-      s.category === "timing" || s.category === "withdrawal" || s.title?.toLowerCase().includes("tax") || s.title?.toLowerCase().includes("roth")
+  // Categorize strategies for distinct counting
+  const categorizeStrategies = () => {
+    const taxEfficiency = matchedStrategies.filter(s => 
+      ['roth-conversion', 'backdoor-roth', 'mega-backdoor-roth', 'tax-loss-harvesting', 
+       'cost-basis-planning', 'municipal-bonds', 'asset-location'].includes(s.id)
     );
     
-    if (taxStrategies.length > 0) {
+    const retirement = matchedStrategies.filter(s => 
+      ['rmd-minimization', 'qcd', 'qlac', 'nua', 'hsa', 'spousal-ira', 'nqdc'].includes(s.id)
+    );
+    
+    const charitableGiving = matchedStrategies.filter(s => 
+      ['daf', 'crt', 'qcd', 'conservation-easement'].includes(s.id)
+    );
+    
+    const realEstate = matchedStrategies.filter(s => 
+      ['1031-exchange', 'rental-loss-reps', 'depreciation-recapture', 
+       'primary-residence-exclusion', 'opportunity-zone'].includes(s.id)
+    );
+    
+    const business = matchedStrategies.filter(s => 
+      ['qsbs', 'installment-sale', 'flp', 'dynasty-trust'].includes(s.id)
+    );
+    
+    const education = matchedStrategies.filter(s => 
+      ['529-planning'].includes(s.id)
+    );
+    
+    return { taxEfficiency, retirement, charitableGiving, realEstate, business, education };
+  };
+
+  // Generate stories based on DISTINCT category counts
+  const getTopStories = () => {
+    const categories = categorizeStrategies();
+    const stories: { title: string; insight: string; type: "tax" | "growth" | "income" }[] = [];
+    
+    // Tax efficiency story
+    if (categories.taxEfficiency.length > 0) {
       stories.push({
-        title: "Tax Efficiency Opportunity",
-        insight: `Based on your profile, you have ${taxStrategies.length} strategies to potentially reduce your lifetime tax burden.`,
+        title: "Tax Efficiency",
+        insight: `${categories.taxEfficiency.length} strategies to reduce your current and future tax burden.`,
         type: "tax"
       });
     }
 
-    // Check for income/retirement strategies
-    const incomeStrategies = matchedStrategies.filter(s => 
-      s.category === "withdrawal" || s.category === "structure" || 
-      s.title?.toLowerCase().includes("retirement") || s.title?.toLowerCase().includes("income")
-    );
-    if (incomeStrategies.length > 0) {
+    // Retirement story
+    if (categories.retirement.length > 0) {
       stories.push({
-        title: "Income & Retirement Security",
-        insight: `You have ${incomeStrategies.length} strategies available to strengthen your retirement income stream.`,
+        title: "Retirement Planning",
+        insight: `${categories.retirement.length} strategies to optimize your retirement income and distributions.`,
         type: "income"
       });
     }
 
-    // High-impact general
-    if (highImpactStrategies.length > 0 && stories.length < 2) {
+    // Real estate / Business / Giving combined if significant
+    const advancedCount = categories.realEstate.length + categories.business.length + categories.charitableGiving.length;
+    if (advancedCount > 0 && stories.length < 3) {
       stories.push({
-        title: "High-Impact Opportunities",
-        insight: `We identified ${highImpactStrategies.length} high-impact strategies relevant to your situation.`,
+        title: "Advanced Planning",
+        insight: `${advancedCount} advanced strategies including real estate, business, and charitable planning.`,
         type: "growth"
       });
     }
 
-    // Fallback if we have strategies but no specific matches
+    // Fallback if no specific categories
     if (stories.length === 0 && matchedStrategies.length > 0) {
       stories.push({
-        title: "Comprehensive Planning",
+        title: "Planning Opportunities",
         insight: `We identified ${matchedStrategies.length} strategies worth exploring with a qualified professional.`,
         type: "growth"
       });
     }
 
     return stories.slice(0, 3);
+  };
+
+  // Group strategies by category for display
+  const groupedStrategies = () => {
+    const groups: Record<string, MatchedStrategy[]> = {
+      'Tax Efficiency': [],
+      'Retirement & Income': [],
+      'Charitable Giving': [],
+      'Real Estate': [],
+      'Business & Estate': [],
+      'Education': [],
+    };
+    
+    matchedStrategies.forEach(s => {
+      if (['roth-conversion', 'backdoor-roth', 'mega-backdoor-roth', 'tax-loss-harvesting', 
+           'cost-basis-planning', 'municipal-bonds', 'asset-location'].includes(s.id)) {
+        groups['Tax Efficiency'].push(s);
+      } else if (['rmd-minimization', 'qcd', 'qlac', 'nua', 'hsa', 'spousal-ira', 'nqdc'].includes(s.id)) {
+        groups['Retirement & Income'].push(s);
+      } else if (['daf', 'crt', 'conservation-easement'].includes(s.id)) {
+        groups['Charitable Giving'].push(s);
+      } else if (['1031-exchange', 'rental-loss-reps', 'depreciation-recapture', 
+                  'primary-residence-exclusion', 'opportunity-zone'].includes(s.id)) {
+        groups['Real Estate'].push(s);
+      } else if (['qsbs', 'installment-sale', 'flp', 'dynasty-trust'].includes(s.id)) {
+        groups['Business & Estate'].push(s);
+      } else if (['529-planning'].includes(s.id)) {
+        groups['Education'].push(s);
+      } else {
+        // Default bucket
+        groups['Tax Efficiency'].push(s);
+      }
+    });
+    
+    // Filter out empty groups
+    return Object.entries(groups).filter(([_, strategies]) => strategies.length > 0);
   };
 
   if (view === "intro") {
@@ -104,6 +163,8 @@ const Index = () => {
       </div>
     );
   }
+
+  const grouped = groupedStrategies();
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -133,8 +194,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Strategy Catalog Section */}
-        <section className="space-y-6">
+        {/* Strategy Catalog Section - Grouped by Category */}
+        <section className="space-y-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-textPrimary">Recommended Strategies</h2>
             <span className="bg-primarySoft text-primary px-3 py-1 rounded-full text-xs font-semibold">
@@ -142,15 +203,25 @@ const Index = () => {
             </span>
           </div>
           
-          <div className="grid gap-4">
-            {matchedStrategies.map((strategy) => (
-              <StrategyCard 
-                key={strategy.id} 
-                strategy={strategy} 
-                onExplore={() => console.log("Explore", strategy.title)} 
-              />
-            ))}
-          </div>
+          {grouped.map(([groupName, strategies]) => (
+            <div key={groupName} className="space-y-4">
+              <h3 className="text-lg font-semibold text-textPrimary border-b border-border pb-2">
+                {groupName}
+                <span className="ml-2 text-sm font-normal text-textSecondary">
+                  ({strategies.length})
+                </span>
+              </h3>
+              <div className="grid gap-4">
+                {strategies.map((strategy) => (
+                  <StrategyCard 
+                    key={strategy.id} 
+                    strategy={strategy} 
+                    onExplore={() => console.log("Explore", strategy.title)} 
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
 
       </main>
