@@ -83,7 +83,7 @@ export function TaxOnboarding() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-5xl px-4 py-10">
+      <div className="mx-auto max-w-6xl px-4 py-10">
         <ProgressStepper currentStep={step + 1} totalSteps={steps.length} labels={steps} />
 
         {/* STEP 0: Marketing / What is this */}
@@ -108,10 +108,10 @@ export function TaxOnboarding() {
           <div className="mt-8 animate-fade-in">
             <div className="rounded-lg bg-surface border border-border p-8 shadow-subtle mb-8">
               <div className="text-xs font-semibold tracking-wide text-textMuted">PROFILE</div>
-              <h2 className="mt-2 font-semibold leading-tight text-textPrimary text-[clamp(2rem,3.2vw,3.25rem)]">
+              <h2 className="mt-2 font-semibold leading-tight text-textPrimary text-[clamp(2.25rem,4vw,4rem)]">
                 Pick the options that best match your situation
               </h2>
-              <p className="mt-3 leading-normal text-textSecondary text-[clamp(1.125rem,1.4vw,1.35rem)]">
+              <p className="mt-3 leading-normal text-textSecondary text-[clamp(1.25rem,2vw,1.75rem)]">
                 These inputs help show stories and strategies that may be worth discussing.
               </p>
             </div>
@@ -144,10 +144,10 @@ export function TaxOnboarding() {
             <section className="space-y-6">
               <div className="rounded-lg bg-surface border border-border p-8 shadow-subtle">
                 <div className="text-xs font-semibold tracking-wide text-textMuted">RESULTS</div>
-                <h1 className="mt-2 font-semibold leading-tight text-textPrimary text-[clamp(2rem,3.2vw,3.25rem)]">
+                <h1 className="mt-2 font-semibold leading-tight text-textPrimary text-[clamp(2.25rem,4vw,4rem)]">
                   Stories and opportunities worth discussing
                 </h1>
-                <p className="mt-3 leading-normal text-textSecondary text-[clamp(1.125rem,1.4vw,1.35rem)]">
+                <p className="mt-3 leading-normal text-textSecondary text-[clamp(1.25rem,2vw,1.75rem)]">
                   This view highlights tax-planning topics that may be relevant based on your situation.
                   It does not provide advice or savings estimates.
                 </p>
@@ -164,8 +164,8 @@ export function TaxOnboarding() {
             <section className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-bold text-textPrimary text-[clamp(1.5rem,2vw,2rem)]">Opportunities</h2>
-                  <p className="mt-1 text-textSecondary text-[clamp(1rem,1.15vw,1.125rem)]">
+                  <h2 className="font-bold text-textPrimary text-[clamp(1.75rem,2.5vw,2.5rem)]">Opportunities</h2>
+                  <p className="mt-1 text-textSecondary text-[clamp(1.125rem,1.8vw,1.5rem)]">
                     Educational signals to prepare for professional conversations.
                   </p>
                 </div>
