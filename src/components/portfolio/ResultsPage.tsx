@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -12,12 +12,17 @@ import {
   GraduationCap,
   AlertTriangle,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  FileText,
+  CheckSquare,
+  X
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { EnhancedStrategyCard } from "./EnhancedStrategyCard";
 import { SuccessStoryCards } from "./SuccessStoryCards";
 import { DisclosureFooter } from "./DisclosureFooter";
-import type { MatchedStrategy, Persona } from "@/types/persona";
+import { MultiStrategyBriefingWizard } from "./MultiStrategyBriefingWizard";
+import type { MatchedStrategy, Persona, Strategy } from "@/types/persona";
 
 interface ResultsPageProps {
   matchedStrategies: MatchedStrategy[];
@@ -80,6 +85,8 @@ function getTopStrategies(strategies: MatchedStrategy[], limit: number): Matched
 
 export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPageProps) {
   const [showAll, setShowAll] = useState(false);
+  const [selectedStrategies, setSelectedStrategies] = useState<Set<string>>(new Set());
+  const [wizardOpen, setWizardOpen] = useState(false);
   
   // Get user's details for personalized estimates
   const retirementRange = persona?.retirementRange || "500k-1M";
@@ -104,6 +111,55 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
     .filter(s => s.computedImpact === 'high')
     .slice(0, 3);
 
+  // Selection mode is active when at least one strategy is selected
+  const selectionMode = selectedStrategies.size > 0;
+
+  // Toggle strategy selection
+  const toggleStrategy = (strategyId: string) => {
+    setSelectedStrategies(prev => {
+      const next = new Set(prev);
+      if (next.has(strategyId)) {
+        next.delete(strategyId);
+      } else {
+        next.add(strategyId);
+      }
+      return next;
+    });
+  };
+
+  // Select all displayed strategies
+  const selectAll = () => {
+    setSelectedStrategies(new Set(displayedStrategies.map(s => s.id)));
+  };
+
+  // Clear all selections
+  const clearSelection = () => {
+    setSelectedStrategies(new Set());
+  };
+
+  // Remove a strategy from selection (from wizard)
+  const removeFromSelection = (strategyId: string) => {
+    setSelectedStrategies(prev => {
+      const next = new Set(prev);
+      next.delete(strategyId);
+      return next;
+    });
+  };
+
+  // Get selected strategy objects
+  const selectedStrategyObjects = useMemo(() => {
+    return matchedStrategies.filter(s => selectedStrategies.has(s.id)) as Strategy[];
+  }, [matchedStrategies, selectedStrategies]);
+
+  // Client profile for the wizard
+  const clientProfile = {
+    age,
+    ageBand,
+    retirementRange,
+    maritalStatus,
+    employmentStatus,
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
@@ -113,10 +169,23 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
             <Shield className="h-6 w-6 text-primary" />
             <span className="font-bold text-lg text-foreground">Your Tax Opportunities</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={onRestart}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Start Over
-          </Button>
+          <div className="flex items-center gap-2">
+            {selectionMode ? (
+              <>
+                <Button variant="ghost" size="sm" onClick={selectAll}>
+                  Select All
+                </Button>
+                <Button variant="ghost" size="sm" onClick={clearSelection}>
+                  Clear
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={onRestart}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Start Over
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -132,7 +201,10 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
             Your Personalized Tax Strategy Review
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            We've prioritized the {Math.min(matchedStrategies.length, MAX_INITIAL_STRATEGIES)} most relevant strategies based on your profile.
+            {selectionMode 
+              ? `Select the strategies you want to discuss with your advisor, then create a consolidated briefing.`
+              : `We've prioritized the ${Math.min(matchedStrategies.length, MAX_INITIAL_STRATEGIES)} most relevant strategies based on your profile. Tap to select strategies for your advisor meeting.`
+            }
           </p>
         </section>
 
@@ -146,6 +218,14 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
             </p>
           </CardContent>
         </Card>
+
+        {/* Selection Hint - only show when not in selection mode */}
+        {!selectionMode && (
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <CheckSquare className="h-4 w-4" />
+            <span>Tap the checkbox on any strategy to start selecting</span>
+          </div>
+        )}
 
         {/* Top High Impact Section */}
         {topHighImpact.length > 0 && (
@@ -161,12 +241,15 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
                 <EnhancedStrategyCard 
                   key={strategy.id} 
                   strategy={strategy}
-                  defaultExpanded={true}
+                  defaultExpanded={!selectionMode}
                   retirementRange={retirementRange}
                   age={age}
                   ageBand={ageBand}
                   maritalStatus={maritalStatus}
                   employmentStatus={employmentStatus}
+                  isSelected={selectedStrategies.has(strategy.id)}
+                  onToggleSelect={toggleStrategy}
+                  selectionMode={true}
                 />
               ))}
             </div>
@@ -195,6 +278,9 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
                     ageBand={ageBand}
                     maritalStatus={maritalStatus}
                     employmentStatus={employmentStatus}
+                    isSelected={selectedStrategies.has(strategy.id)}
+                    onToggleSelect={toggleStrategy}
+                    selectionMode={true}
                   />
                 ))}
             </div>
@@ -234,6 +320,59 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
       </main>
 
       <DisclosureFooter />
+
+      {/* Sticky Selection Action Bar */}
+      <AnimatePresence>
+        {selectionMode && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 bg-background border-t border-border shadow-lg z-50"
+          >
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-sm">
+                    {selectedStrategies.size}
+                  </div>
+                  <span className="text-sm font-medium text-foreground">
+                    {selectedStrategies.size === 1 ? 'strategy' : 'strategies'} selected
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearSelection}
+                    className="gap-1"
+                  >
+                    <X className="h-4 w-4" />
+                    Clear
+                  </Button>
+                  <Button
+                    onClick={() => setWizardOpen(true)}
+                    className="gap-2"
+                  >
+                    <FileText className="h-4 w-4" />
+                    Create Briefing
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Multi-Strategy Briefing Wizard */}
+      <MultiStrategyBriefingWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        strategies={selectedStrategyObjects}
+        clientProfile={clientProfile}
+        onRemoveStrategy={removeFromSelection}
+      />
     </div>
   );
 }
