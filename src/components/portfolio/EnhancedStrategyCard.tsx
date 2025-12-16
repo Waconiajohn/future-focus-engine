@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   ChevronDown, 
   ChevronUp, 
@@ -28,6 +29,9 @@ interface EnhancedStrategyCardProps {
   ageBand?: string;
   maritalStatus?: string;
   employmentStatus?: string;
+  isSelected?: boolean;
+  onToggleSelect?: (strategyId: string) => void;
+  selectionMode?: boolean;
 }
 
 export function EnhancedStrategyCard({ 
@@ -38,6 +42,9 @@ export function EnhancedStrategyCard({
   ageBand,
   maritalStatus,
   employmentStatus,
+  isSelected = false,
+  onToggleSelect,
+  selectionMode = false,
 }: EnhancedStrategyCardProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -55,16 +62,38 @@ export function EnhancedStrategyCard({
     employmentStatus,
   };
 
+  const handleCheckboxClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleSelect?.(strategy.id);
+  };
+
   return (
     <Card className={cn(
-      "overflow-hidden border transition-all duration-300 group",
+      "overflow-hidden border transition-all duration-300 group relative",
       isExpanded 
         ? "border-primary/30 shadow-lg ring-1 ring-primary/10" 
-        : "border-border/50 shadow-sm hover:shadow-md hover:border-primary/20"
+        : "border-border/50 shadow-sm hover:shadow-md hover:border-primary/20",
+      isSelected && "ring-2 ring-primary border-primary/50 bg-primary/5"
     )}>
+      {/* Selection Checkbox */}
+      {selectionMode && (
+        <div 
+          className="absolute top-4 right-4 z-10"
+          onClick={handleCheckboxClick}
+        >
+          <Checkbox
+            checked={isSelected}
+            className="h-5 w-5 border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+          />
+        </div>
+      )}
+
       {/* Header - Always Visible */}
       <div
-        className="p-5 cursor-pointer select-none"
+        className={cn(
+          "p-5 cursor-pointer select-none",
+          selectionMode && "pr-12" // Make room for checkbox
+        )}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex justify-between items-start gap-4">
