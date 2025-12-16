@@ -12,9 +12,10 @@ import { ChevronRight, ChevronLeft, Check, Target, Briefcase, Home, DollarSign, 
 
 interface PersonaSelectorProps {
   onComplete: (persona: Persona) => void;
+  onBack?: () => void;
 }
 
-export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
+export function PersonaSelector({ onComplete, onBack }: PersonaSelectorProps) {
   const [step, setStep] = useState(1);
   const totalSteps = 7; // Added screening step
 
@@ -41,6 +42,8 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
       setStep(step - 2);
     } else if (step > 1) {
       setStep(step - 1);
+    } else if (step === 1 && onBack) {
+      onBack();
     }
   };
 
@@ -268,12 +271,11 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
 
           </div>
 
-          {/* Navigation */}
           <div className="flex justify-between items-center mt-10 pt-6 border-t border-border/50">
             <Button
               variant="ghost"
               onClick={handleBack}
-              disabled={step === 1}
+              disabled={step === 1 && !onBack}
               className="text-textMuted hover:text-textPrimary"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />

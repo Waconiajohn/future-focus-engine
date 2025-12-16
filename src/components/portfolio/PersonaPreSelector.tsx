@@ -9,6 +9,7 @@ import {
   Building2, 
   Home,
   ChevronRight,
+  ChevronLeft,
   UserX
 } from "lucide-react";
 
@@ -82,9 +83,10 @@ const PERSONA_OPTIONS: PersonaOption[] = [
 
 interface PersonaPreSelectorProps {
   onSelect: (persona: PersonaType) => void;
+  onBack?: () => void;
 }
 
-export function PersonaPreSelector({ onSelect }: PersonaPreSelectorProps) {
+export function PersonaPreSelector({ onSelect, onBack }: PersonaPreSelectorProps) {
   const [selected, setSelected] = useState<PersonaType | null>(null);
 
   return (
@@ -141,8 +143,20 @@ export function PersonaPreSelector({ onSelect }: PersonaPreSelectorProps) {
             </div>
           </div>
 
-          {/* Continue Button */}
-          <div className="flex justify-end mt-8 pt-6 border-t border-border/50">
+          {/* Navigation */}
+          <div className="flex justify-between items-center mt-8 pt-6 border-t border-border/50">
+            {onBack ? (
+              <Button
+                variant="ghost"
+                onClick={onBack}
+                className="text-textMuted hover:text-textPrimary"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+            ) : (
+              <div />
+            )}
             <Button
               onClick={() => selected && onSelect(selected)}
               disabled={!selected}

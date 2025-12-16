@@ -56,7 +56,7 @@ const Index = () => {
             Let's find the strategies most relevant to your situation.
           </p>
         </div>
-        <PersonaPreSelector onSelect={handlePersonaTypeSelect} />
+        <PersonaPreSelector onSelect={handlePersonaTypeSelect} onBack={() => setView("blunders")} />
       </div>
     );
   }
@@ -73,7 +73,7 @@ const Index = () => {
             Answer a few questions to discover relevant strategies.
           </p>
         </div>
-        <PersonaSelector onComplete={handlePersonaComplete} />
+        <PersonaSelector onComplete={handlePersonaComplete} onBack={() => setView("persona-select")} />
       </div>
     );
   }
