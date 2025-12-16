@@ -36,14 +36,16 @@ const Index = () => {
     setPersona(null);
   };
 
+  // Create a lookup map for strategies
+  const strategyMap = Object.fromEntries(STRATEGIES.map(s => [s.id, s]));
+
   // Helper to get 3 top stories
   const getTopStories = () => {
-    // Ideally we pick 2-3 distint types of stories (tax, growth, income) based on high impact matches
     const stories: { title: string; insight: string; type: "tax" | "growth" | "income" }[] = [];
     
     // Check for tax heavy strategies
     const taxStrats = results.filter(r => 
-      STRATEGIES[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("tax") && r.confidence === "High"
+      strategyMap[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("tax") && r.confidence === "High"
     );
     if (taxStrats.length > 0) {
       stories.push({
@@ -55,15 +57,15 @@ const Index = () => {
 
     // Check for income/growth
     const incomeStrats = results.filter(r => 
-      (STRATEGIES[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("income") || 
-       STRATEGIES[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("retirement")) && 
+      (strategyMap[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("income") || 
+       strategyMap[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("retirement")) && 
        r.confidence === "High"
     );
     if (incomeStrats.length > 0) {
       stories.push({
         title: "Income & Retirement Security",
         insight: `You have ${incomeStrats.length} high-impact strategies available to strengthen your retirement income stream and longevity protection.`,
-        type: "income" // or growth
+        type: "income"
       });
     }
 
@@ -139,7 +141,8 @@ const Index = () => {
           
           <div className="grid gap-4">
             {results.map((result) => {
-              const strategy = STRATEGIES[result.strategyId];
+              const strategy = strategyMap[result.strategyId];
+              if (!strategy) return null;
               return (
                 <StrategyCard 
                   key={result.strategyId} 
