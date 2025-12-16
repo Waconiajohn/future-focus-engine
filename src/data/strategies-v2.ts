@@ -407,7 +407,7 @@ export const strategies: Strategy[] = [
 ];
 
 // ========================================
-// SCORING-BASED MATCH FUNCTION
+// SCORING-BASED MATCH FUNCTION WITH FILTERING
 // ========================================
 export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
   const flags = computeTransitionFlags(profile);
@@ -419,9 +419,45 @@ export function matchStrategies(profile: UserProfile): MatchedStrategy[] {
   for (const strategy of strategies) {
     let score = 0;
     
+    // ========================================
+    // HARD FILTERING based on screening flags
+    // If user explicitly said "no" via unchecked checkbox, exclude strategy
+    // ========================================
+    
+    // HSA requires HDHP enrollment
+    if (strategy.id === 'hsa' && !profile.enrolledInHDHP) continue;
+    
+    // Charitable strategies require charitable intent
+    if (['qcd', 'daf', 'crt', 'conservation-easement'].includes(strategy.id) && 
+        (!profile.charitableGiving || profile.charitableGiving === 'none')) continue;
+    
+    // NUA requires employer stock
+    if (strategy.id === 'nua' && !profile.hasEmployerStock) continue;
+    
+    // Business strategies require business ownership
+    if (['qsbs', 'installment-sale'].includes(strategy.id) && !profile.hasBusinessOwnership) continue;
+    
+    // 529 requires education intent
+    if (strategy.id === '529-planning' && !profile.educationFundingIntent) continue;
+    
+    // Tax-loss harvesting and cost basis require taxable brokerage/gains
+    if (['tax-loss-harvesting', 'cost-basis-planning'].includes(strategy.id) && 
+        !profile.hasTaxableBrokerage && !profile.hasEmbeddedCapitalGains) continue;
+    
+    // Dynasty trust and FLP require estate/wealth transfer concerns
+    if (['dynasty-trust', 'flp'].includes(strategy.id) && 
+        !profile.familyWealthTransferIntent && !profile.estatePlanningConcern) continue;
+    
+    // Opportunity zone requires capital gains
+    if (strategy.id === 'opportunity-zone' && !profile.hasRealizedCapitalGains) continue;
+    
+    // ========================================
+    // SCORING (for strategies that pass filtering)
+    // ========================================
+    
     // Base score from net worth tier relevance
     if (isTierRelevant(strategy.id, retirementTier)) {
-      score += 30 + netWorthScore; // Base 30 + net worth bonus
+      score += 30 + netWorthScore;
     }
     
     // Trigger scoring (additive, not eliminative)

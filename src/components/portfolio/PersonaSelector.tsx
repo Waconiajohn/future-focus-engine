@@ -1,12 +1,13 @@
 
 import { cn } from "@/lib/utils";
-import { Persona, AgeBand, EmploymentStatus, MaritalStatus, RealEstateProfile, RetirementRange } from "@/types/persona";
+import { Persona, AgeBand, EmploymentStatus, MaritalStatus, RealEstateProfile, RetirementRange, ScreeningFlags } from "@/types/persona";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ProgressStepper } from "./ProgressStepper";
+import { ScreeningStep } from "./ScreeningStep";
 import { ChevronRight, ChevronLeft, Check, Target, Briefcase, Home, DollarSign, Users } from "lucide-react";
 
 interface PersonaSelectorProps {
@@ -15,7 +16,7 @@ interface PersonaSelectorProps {
 
 export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
   const [step, setStep] = useState(1);
-  const totalSteps = 6;
+  const totalSteps = 7; // Added screening step
 
   // State for persona
   const [ageBand, setAgeBand] = useState<AgeBand | null>(null);
@@ -31,8 +32,6 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
       setStep(step + 2); // Skip spouse employment step (go to step 5)
     } else if (step < totalSteps) {
       setStep(step + 1);
-    } else {
-      handleFinish();
     }
   };
 
@@ -45,7 +44,7 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
     }
   };
 
-  const handleFinish = () => {
+  const handleScreeningComplete = (screening: ScreeningFlags) => {
     if (ageBand && maritalStatus && retirementRange) {
       onComplete({
         ageBand,
@@ -54,8 +53,9 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
         spouseEmployment: maritalStatus === "Married" ? spouseEmployment : undefined,
         retirementRange,
         realEstate,
-        hasTaxableBrokerage: true, 
-        hasHSA: true,
+        screening,
+        hasTaxableBrokerage: true,
+        hasHSA: screening.hasHighDeductibleHealthPlan,
       });
     }
   };
@@ -68,9 +68,25 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
       case 4: return !!spouseEmployment;
       case 5: return !!retirementRange;
       case 6: return !!realEstate;
+      case 7: return true; // Screening can be skipped
       default: return false;
     }
   };
+
+  // Render screening step separately
+  if (step === 7) {
+    return (
+      <div className="w-full max-w-lg mx-auto">
+        <ProgressStepper currentStep={step} totalSteps={totalSteps} />
+        <div className="mt-8">
+          <ScreeningStep 
+            onComplete={handleScreeningComplete}
+            onBack={handleBack}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-lg mx-auto">
