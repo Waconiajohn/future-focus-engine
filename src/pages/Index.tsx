@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PersonaSelector } from "@/components/portfolio/PersonaSelector";
 import { PersonaPreSelector, type PersonaType } from "@/components/portfolio/PersonaPreSelector";
 import { FrontPageIntro } from "@/components/tax/FrontPageIntro";
+import { ThreeBlundersStep } from "@/components/tax/ThreeBlundersStep";
 import { ResultsPage } from "@/components/portfolio/ResultsPage";
 import { matchStrategies } from "@/data/strategies-v2";
 import { personaToUserProfile } from "@/domain/tax/profileAdapter";
@@ -9,7 +10,7 @@ import type { Persona, MatchedStrategy } from "@/types/persona";
 import { Shield } from "lucide-react";
 
 const Index = () => {
-  const [view, setView] = useState<"intro" | "persona-select" | "onboarding" | "results">("intro");
+  const [view, setView] = useState<"intro" | "blunders" | "persona-select" | "onboarding" | "results">("intro");
   const [matchedStrategies, setMatchedStrategies] = useState<MatchedStrategy[]>([]);
   const [persona, setPersona] = useState<Persona | null>(null);
   const [selectedPersonaType, setSelectedPersonaType] = useState<PersonaType | null>(null);
@@ -36,7 +37,11 @@ const Index = () => {
   };
 
   if (view === "intro") {
-    return <FrontPageIntro onStart={() => setView("persona-select")} />;
+    return <FrontPageIntro onStart={() => setView("blunders")} />;
+  }
+
+  if (view === "blunders") {
+    return <ThreeBlundersStep onContinue={() => setView("persona-select")} />;
   }
 
   if (view === "persona-select") {
