@@ -71,6 +71,16 @@ export type SelfEmployedDetails = {
   hasPositiveCashFlow?: boolean;
 };
 
+export type ScreeningFlags = {
+  hasHighDeductibleHealthPlan?: boolean;
+  hasCharitableIntent?: boolean;
+  hasEmployerStockIn401k?: boolean;
+  hasBusinessOwnership?: boolean;
+  hasEducationGoals?: boolean;
+  hasUnrealizedGains?: boolean;
+  hasEstateAboveExemption?: boolean;
+};
+
 export type Persona = {
   ageBand: AgeBand;
   maritalStatus: MaritalStatus;
@@ -79,7 +89,10 @@ export type Persona = {
   retirementRange: RetirementRange;
   realEstate: RealEstateProfile;
 
-  // Optional refiners that reduce false positives
+  // Screening flags from targeted questions
+  screening?: ScreeningFlags;
+
+  // Legacy refiners (can be deprecated)
   hasTaxableBrokerage?: boolean;
   hasEmployerStockIn401k?: boolean;
   charitableGivingIntent?: boolean;

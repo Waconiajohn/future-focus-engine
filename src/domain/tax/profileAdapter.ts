@@ -70,6 +70,9 @@ export function personaToUserProfile(persona: Persona): UserProfile {
   const retirementRange = normalizeRetirementRange(persona.retirementRange);
   const tierIndex = getRetirementTierIndex(retirementRange);
 
+  // Get screening flags (default to empty if not provided)
+  const screening = persona.screening ?? {};
+
   // INTELLIGENT ASSUMPTIONS based on net worth tier
   const isHigherNetWorth = tierIndex >= 2; // $500k+
   const isHighNetWorth = tierIndex >= 3; // $1M+
@@ -87,15 +90,15 @@ export function personaToUserProfile(persona: Persona): UserProfile {
   // Higher net worth often correlates with high tax bracket
   const highTaxBracket = isHigherNetWorth;
   
-  // If they have taxable brokerage, they likely have embedded gains
-  const hasEmbeddedCapitalGains = persona.hasTaxableBrokerage || isHigherNetWorth;
+  // Use screening flags for unrealized gains, otherwise assume based on net worth
+  const hasEmbeddedCapitalGains = screening.hasUnrealizedGains ?? (persona.hasTaxableBrokerage || isHigherNetWorth);
   
-  // Higher net worth individuals may have estate planning concerns
-  const estatePlanningConcern = isHighNetWorth;
+  // Use screening flags for estate planning
+  const estatePlanningConcern = screening.hasEstateAboveExemption ?? isHighNetWorth;
   
   // Higher net worth individuals may think about multi-generational planning
-  const multiGenerationalPlanningIntent = isVeryHighNetWorth;
-  const familyWealthTransferIntent = isHighNetWorth;
+  const multiGenerationalPlanningIntent = screening.hasEstateAboveExemption ?? isVeryHighNetWorth;
+  const familyWealthTransferIntent = screening.hasEstateAboveExemption ?? isHighNetWorth;
   
   // If married with one employed spouse, spousal IRA is relevant
   const isSpousalIraRelevant = maritalStatus === 'Married' && 
@@ -112,58 +115,60 @@ export function personaToUserProfile(persona: Persona): UserProfile {
     spouseEmploymentStatus,
 
     // Account types - intelligent assumptions
-    hasTaxableBrokerage: persona.hasTaxableBrokerage ?? isHigherNetWorth,
+    hasTaxableBrokerage: screening.hasUnrealizedGains ?? persona.hasTaxableBrokerage ?? isHigherNetWorth,
     hasTraditionalIRA: hasPreTaxRetirement,
     has401k: hasPreTaxRetirement && (employmentStatus === 'employed' || tierIndex >= 1),
     hasMultipleAccountTypes,
     
-    // Employer/employment related
-    hasEmployerStock: persona.hasEmployerStockIn401k ?? (isHigherNetWorth && employmentStatus === 'employed'),
+    // Use screening flags for employer stock
+    hasEmployerStock: screening.hasEmployerStockIn401k ?? persona.hasEmployerStockIn401k ?? false,
     hasRentalRealEstate: persona.realEstate === "Rental",
-    hasBusinessOwnership: persona.businessOwnerOrEquity ?? false,
+    
+    // Use screening flags for business ownership
+    hasBusinessOwnership: screening.hasBusinessOwnership ?? persona.businessOwnerOrEquity ?? false,
     
     // Income/Roth related - intelligent assumptions
     incomeAboveRothLimits,
-    hasLargePreTaxIRA: tierIndex >= 2, // $500k+ likely has large pre-tax IRA
-    employer401kAllowsAfterTax: employmentStatus === 'employed', // Assume possible
+    hasLargePreTaxIRA: tierIndex >= 2,
+    employer401kAllowsAfterTax: employmentStatus === 'employed',
     max401kContributions: isHigherNetWorth && employmentStatus === 'employed',
     hasExecutiveCompensation: isHighNetWorth && employmentStatus === 'employed',
     separatedFromService: employmentStatus === 'unemployed' || employmentStatus === 'consulting',
     
-    // Education & family
-    enrolledInHDHP: persona.hasHSA ?? (age < 65), // Many under 65 have HDHP option
-    has529Account: persona.has529 ?? false,
-    educationFundingIntent: persona.has529 ?? (age < 60 && tierIndex >= 1),
+    // Use screening flags for HSA and education
+    enrolledInHDHP: screening.hasHighDeductibleHealthPlan ?? persona.hasHSA ?? false,
+    has529Account: screening.hasEducationGoals ?? persona.has529 ?? false,
+    educationFundingIntent: screening.hasEducationGoals ?? persona.has529 ?? false,
     familyWealthTransferIntent,
     multiGenerationalPlanningIntent,
 
-    // Investment/gains - intelligent assumptions
-    hasMarketVolatility: true, // Always relevant
+    // Investment/gains - use screening flags
+    hasMarketVolatility: true,
     hasEmbeddedCapitalGains,
-    hasRealizedCapitalGains: hasEmbeddedCapitalGains, // If embedded, may realize
+    hasRealizedCapitalGains: hasEmbeddedCapitalGains,
     highTaxBracket,
     hasTaxableFixedIncome: isHigherNetWorth,
     
     // Real estate
-    intendsToSellProperty: persona.realEstate === "Rental", // Rental owners should know options
-    sellingPrimaryResidence: false, // Don't assume
+    intendsToSellProperty: persona.realEstate === "Rental",
+    sellingPrimaryResidence: false,
     ownsDepreciatedRealEstate: persona.realEstate === "Rental",
     activeParticipationInRental: persona.rentalLossesLikely ?? (persona.realEstate === "Rental"),
     ownsLargeLandParcel: isVeryHighNetWorth && persona.realEstate !== "None",
     
-    // Business
-    ownsCCorpStock: persona.businessOwnerOrEquity ?? false,
-    qsbsHoldingPeriod5Years: persona.businessOwnerOrEquity ?? false,
-    sellingBusinessOrRealEstate: persona.businessOwnerOrEquity || persona.realEstate === "Rental",
+    // Use screening flags for business
+    ownsCCorpStock: screening.hasBusinessOwnership ?? persona.businessOwnerOrEquity ?? false,
+    qsbsHoldingPeriod5Years: screening.hasBusinessOwnership ?? persona.businessOwnerOrEquity ?? false,
+    sellingBusinessOrRealEstate: (screening.hasBusinessOwnership ?? persona.businessOwnerOrEquity) || persona.realEstate === "Rental",
     
     // Income timing
-    incomeSpike: false, // Don't assume
+    incomeSpike: false,
     highIncomeYear: highTaxBracket,
     incomeSmoothingPreference: isHigherNetWorth,
-    expectedFutureTaxRatesHigher: age < 65, // Younger folks may expect higher future rates
+    expectedFutureTaxRatesHigher: age < 65,
     
-    // Planning preferences - intelligent assumptions
-    charitableGiving: persona.charitableGivingIntent ? "5k-25k" : (isHighNetWorth ? "5k-25k" : "none"),
+    // Use screening flags for charitable giving
+    charitableGiving: screening.hasCharitableIntent ? "5k-25k" : (isHighNetWorth ? "5k-25k" : "none"),
     longevityConcern: age >= 55,
     incomeReplacementNeed: age >= 55 && age <= 70,
     estatePlanningConcern,
