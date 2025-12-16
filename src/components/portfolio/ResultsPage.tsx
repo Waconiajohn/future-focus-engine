@@ -104,7 +104,7 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="bg-surface border-b border-border sticky top-0 z-10 shadow-sm">
+      <header className="bg-background border-b border-border sticky top-0 z-10 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
