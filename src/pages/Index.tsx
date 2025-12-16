@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PersonaSelector } from "@/components/portfolio/PersonaSelector";
 import { PersonaPreSelector, type PersonaType } from "@/components/portfolio/PersonaPreSelector";
-import { IntroStep } from "@/components/steps/IntroStep";
+import { FrontPageIntro } from "@/components/tax/FrontPageIntro";
 import { ResultsPage } from "@/components/portfolio/ResultsPage";
 import { matchStrategies } from "@/data/strategies-v2";
 import { personaToUserProfile } from "@/domain/tax/profileAdapter";
@@ -36,7 +36,7 @@ const Index = () => {
   };
 
   if (view === "intro") {
-    return <IntroStep onStart={() => setView("persona-select")} />;
+    return <FrontPageIntro onStart={() => setView("persona-select")} />;
   }
 
   if (view === "persona-select") {
