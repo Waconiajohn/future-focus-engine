@@ -18,15 +18,15 @@ export function IntroStep({ onStart }: IntroStepProps) {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <h1 className="font-serif font-semibold text-foreground mb-6 leading-tight opacity-0 animate-fade-up text-[clamp(2.5rem,4.2vw,4.75rem)]">
+            <h1 className="font-serif font-semibold text-foreground mb-6 leading-tight opacity-0 animate-fade-up text-[clamp(2.5rem,5vw,5rem)]">
               Discover Tax Strategies<br />
               <span className="text-sage">Worth Exploring</span>
             </h1>
             
-            <p className="text-muted-foreground mb-8 leading-relaxed opacity-0 animate-fade-up animation-delay-100 text-[clamp(1.125rem,1.5vw,1.5rem)]">
+            <p className="text-muted-foreground mb-8 leading-relaxed opacity-0 animate-fade-up animation-delay-100 text-[clamp(1.25rem,2vw,1.75rem)]">
               Answer a few simple questions to see which retirement tax planning 
               opportunities might be relevant to your situation.
             </p>
