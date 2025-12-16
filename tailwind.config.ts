@@ -26,7 +26,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
         serif: ['Outfit', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
@@ -116,6 +116,14 @@ export default {
           light: "hsl(var(--sage-light))",
           foreground: "hsl(var(--sage-foreground))",
         },
+        // Surface and text semantic tokens
+        surface: "hsl(var(--card))",
+        surfaceMuted: "hsl(var(--muted))",
+        textPrimary: "hsl(var(--foreground))",
+        textSecondary: "hsl(var(--muted-foreground))",
+        textMuted: "hsl(var(--muted-foreground))",
+        primarySoft: "hsl(var(--primarySoft))",
+        "warm-gray": "hsl(var(--warm-gray))",
       },
       borderRadius: {
         'lg': "var(--radius)",
@@ -134,6 +142,7 @@ export default {
         'glow-red': '0 0 20px -5px hsl(var(--status-critical) / 0.3)',
         'card-hover': '0 8px 30px -10px rgba(0, 0, 0, 0.15)',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
       },
       backdropBlur: {
         'glass': '12px',
