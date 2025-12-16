@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { PersonaSelector } from "@/components/portfolio/PersonaSelector";
+import { IntroStep } from "@/components/steps/IntroStep";
 import { StoryCard } from "@/components/portfolio/StoryCard";
 import { StrategyCard } from "@/components/portfolio/StrategyCard";
 import { DisclosureFooter } from "@/components/portfolio/DisclosureFooter";
@@ -10,7 +11,7 @@ import { Shield, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
-  const [view, setView] = useState<"onboarding" | "results">("onboarding");
+  const [view, setView] = useState<"intro" | "onboarding" | "results">("intro");
   const [results, setResults] = useState<TriggerResult[]>([]);
   const [persona, setPersona] = useState<Persona | null>(null);
 
@@ -30,7 +31,7 @@ const Index = () => {
   };
 
   const resetFlow = () => {
-    setView("onboarding");
+    setView("intro");
     setResults([]);
     setPersona(null);
   };
@@ -42,7 +43,7 @@ const Index = () => {
     
     // Check for tax heavy strategies
     const taxStrats = results.filter(r => 
-      STRATEGIES[r.strategyId].whyThisMayApply.toLowerCase().includes("tax") && r.confidence === "High"
+      STRATEGIES[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("tax") && r.confidence === "High"
     );
     if (taxStrats.length > 0) {
       stories.push({
@@ -54,8 +55,8 @@ const Index = () => {
 
     // Check for income/growth
     const incomeStrats = results.filter(r => 
-      (STRATEGIES[r.strategyId].whyThisMayApply.toLowerCase().includes("income") || 
-       STRATEGIES[r.strategyId].whyThisMayApply.toLowerCase().includes("retirement")) && 
+      (STRATEGIES[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("income") || 
+       STRATEGIES[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("retirement")) && 
        r.confidence === "High"
     );
     if (incomeStrats.length > 0) {
@@ -78,6 +79,10 @@ const Index = () => {
     return stories.slice(0, 3);
   };
 
+  if (view === "intro") {
+    return <IntroStep onStart={() => setView("onboarding")} />;
+  }
+
   if (view === "onboarding") {
     return (
       <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
@@ -85,9 +90,9 @@ const Index = () => {
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-primarySoft mb-4">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-textPrimary tracking-tight">PortfolioGuard</h1>
+          <h1 className="text-3xl font-bold text-textPrimary tracking-tight">Tax Opportunity Explorer</h1>
           <p className="mt-2 text-lg text-textSecondary">
-            Smart, story-driven portfolio analysis for your financial future.
+            Answer a few questions to discover relevant strategies.
           </p>
         </div>
         <PersonaSelector onComplete={handlePersonaComplete} />
