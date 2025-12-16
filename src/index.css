@@ -69,6 +69,11 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 217 33% 17%;
     --sidebar-ring: 217 91% 60%;
+
+    /* Sage accent colors */
+    --sage: 151 55% 41%;
+    --sage-light: 151 55% 95%;
+    --sage-foreground: 0 0% 100%;
   }
 
   /* Safe area for notched devices */
@@ -409,6 +414,19 @@
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider;
     background: hsl(var(--primary) / 0.1);
     color: hsl(var(--primary));
+  }
+
+  /* ============================================
+     HERO GRADIENT BACKGROUND
+     ============================================ */
+  
+  .gradient-hero {
+    background: linear-gradient(
+      to bottom,
+      hsl(var(--background)) 0%,
+      hsl(210 40% 96%) 50%,
+      hsl(var(--background)) 100%
+    );
   }
 }
 

@@ -111,6 +111,11 @@ export default {
           silver: "hsl(210, 10%, 70%)",
           bronze: "hsl(30, 50%, 50%)",
         },
+        sage: {
+          DEFAULT: "hsl(var(--sage))",
+          light: "hsl(var(--sage-light))",
+          foreground: "hsl(var(--sage-foreground))",
+        },
       },
       borderRadius: {
         'lg': "var(--radius)",
