@@ -15,6 +15,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { EnhancedStrategyCard } from "./EnhancedStrategyCard";
+import { SuccessStoryCards } from "./SuccessStoryCards";
 import { DisclosureFooter } from "./DisclosureFooter";
 import type { MatchedStrategy, Persona } from "@/types/persona";
 
@@ -204,6 +205,11 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
             </Button>
           </div>
         )}
+
+        {/* Success Stories */}
+        <div className="pt-8 border-t border-border">
+          <SuccessStoryCards />
+        </div>
 
         {/* CTA Section */}
         <section className="text-center py-6 space-y-4 border-t border-border mt-8">
