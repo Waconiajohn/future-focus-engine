@@ -72,8 +72,8 @@ export function EnhancedStrategyCard({
             {/* Personalized Savings Preview */}
             {!isExpanded && (
               <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-                <TrendingUp className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-foreground">
                   Your estimated savings: {formatEstimate(personalizedEstimate)}
                 </span>
               </div>
@@ -103,14 +103,14 @@ export function EnhancedStrategyCard({
               
               {/* Why It Appears For You */}
               {whyForYou && (
-                <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-100 dark:border-blue-900">
+                <div className="p-4 bg-muted rounded-lg border border-border">
                   <div className="flex items-start gap-3">
-                    <Lightbulb className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                    <Lightbulb className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-1">
+                      <h4 className="text-sm font-semibold text-foreground mb-1">
                         Why This Appeared For You
                       </h4>
-                      <p className="text-sm text-blue-700 dark:text-blue-400">{whyForYou}</p>
+                      <p className="text-sm text-muted-foreground">{whyForYou}</p>
                     </div>
                   </div>
                 </div>
@@ -127,11 +127,11 @@ export function EnhancedStrategyCard({
               {/* Example Scenario */}
               {example && (
                 <>
-                  <div className="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-100 dark:border-amber-900">
-                    <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-2 flex items-center gap-2">
+                  <div className="p-4 bg-accent/50 rounded-lg border border-border">
+                    <h4 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
                       <span className="text-base">💡</span> Real-World Example
                     </h4>
-                    <p className="text-sm text-amber-900 dark:text-amber-200 leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {example.scenario}
                     </p>
                   </div>
@@ -139,30 +139,30 @@ export function EnhancedStrategyCard({
                   {/* Key Details Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Personalized Savings */}
-                    <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-100 dark:border-green-900">
+                    <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
                       <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp className="h-4 w-4 text-green-600" />
-                        <h4 className="text-sm font-semibold text-green-800 dark:text-green-300">
+                        <TrendingUp className="h-4 w-4 text-primary" />
+                        <h4 className="text-sm font-semibold text-foreground">
                           Your Estimated Savings
                         </h4>
                       </div>
-                      <p className="text-lg font-bold text-green-700 dark:text-green-400">
+                      <p className="text-lg font-bold text-primary">
                         {formatEstimate(personalizedEstimate)}
                       </p>
-                      <p className="text-xs text-green-600 dark:text-green-500 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         {personalizedEstimate.explanation}
                       </p>
                     </div>
 
                     {/* Best Timeframe */}
-                    <div className="p-4 bg-purple-50 dark:bg-purple-950/30 rounded-lg border border-purple-100 dark:border-purple-900">
+                    <div className="p-4 bg-muted rounded-lg border border-border">
                       <div className="flex items-center gap-2 mb-2">
-                        <Clock className="h-4 w-4 text-purple-600" />
-                        <h4 className="text-sm font-semibold text-purple-800 dark:text-purple-300">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <h4 className="text-sm font-semibold text-foreground">
                           Best Timeframe
                         </h4>
                       </div>
-                      <p className="text-sm text-purple-700 dark:text-purple-400">
+                      <p className="text-sm text-muted-foreground">
                         {example.timeframe}
                       </p>
                     </div>

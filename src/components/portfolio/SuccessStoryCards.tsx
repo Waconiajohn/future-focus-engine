@@ -21,7 +21,7 @@ const SUCCESS_STORIES: SuccessStory[] = [
     savings: "$790,000",
     quote: "We had no idea our lifetime tax bill would be over $1.1 million without a plan. Converting portions of our IRAs over 10 years at lower rates changed everything.",
     icon: <TrendingUp className="h-5 w-5" />,
-    color: "from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-emerald-200 dark:border-emerald-800",
+    color: "bg-card border-border",
   },
   {
     id: "qcd-qlac",
@@ -31,7 +31,7 @@ const SUCCESS_STORIES: SuccessStory[] = [
     savings: "$490,000",
     quote: "We were terrified of the RMD tax bomb in our 70s. Using QCDs for our charitable giving and a QLAC to defer some distributions kept us in a lower bracket.",
     icon: <Heart className="h-5 w-5" />,
-    color: "from-rose-50 to-pink-50 dark:from-rose-950/30 dark:to-pink-950/30 border-rose-200 dark:border-rose-800",
+    color: "bg-card border-border",
   },
   {
     id: "early-conversion",
@@ -41,7 +41,7 @@ const SUCCESS_STORIES: SuccessStory[] = [
     savings: "$225,000",
     quote: "We started converting to Roth in our late 50s while still in a moderate bracket. Even if tax rates rise, we are protected now.",
     icon: <DollarSign className="h-5 w-5" />,
-    color: "from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800",
+    color: "bg-card border-border",
   },
   {
     id: "real-estate",
@@ -51,7 +51,7 @@ const SUCCESS_STORIES: SuccessStory[] = [
     savings: "$340,000",
     quote: "We thought selling our rentals would trigger a massive tax bill. By combining a 1031 exchange with an installment sale on one property, we kept our capital working.",
     icon: <Building2 className="h-5 w-5" />,
-    color: "from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800",
+    color: "bg-card border-border",
   },
 ];
 
@@ -71,12 +71,12 @@ export function SuccessStoryCards() {
         {SUCCESS_STORIES.map((story) => (
           <Card 
             key={story.id} 
-            className={`bg-gradient-to-br ${story.color} border overflow-hidden`}
+            className={`${story.color} overflow-hidden`}
           >
             <CardContent className="p-5">
               {/* Header */}
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 rounded-full bg-white/60 dark:bg-background/40">
+                <div className="p-2 rounded-full bg-muted">
                   {story.icon}
                 </div>
                 <div>
@@ -86,9 +86,9 @@ export function SuccessStoryCards() {
               </div>
 
               {/* Strategy & Savings */}
-              <div className="flex items-center justify-between mb-3 py-2 px-3 bg-white/50 dark:bg-background/30 rounded-lg">
+              <div className="flex items-center justify-between mb-3 py-2 px-3 bg-muted rounded-lg">
                 <span className="text-sm font-medium text-foreground">{story.strategy}</span>
-                <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                <span className="text-lg font-bold text-primary">
                   {story.savings}
                 </span>
               </div>

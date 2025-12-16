@@ -134,11 +134,11 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
         </section>
 
         {/* Warning Banner */}
-        <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900">
+        <Card className="border-border bg-muted">
           <CardContent className="p-4 flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-700 dark:text-amber-400">
-              <strong className="text-amber-800 dark:text-amber-300">Educational only.</strong>{" "}
+            <AlertTriangle className="h-5 w-5 text-foreground shrink-0 mt-0.5" />
+            <p className="text-sm text-foreground">
+              <strong>Educational only.</strong>{" "}
               Consult a CPA or CFP before implementing any strategy.
             </p>
           </CardContent>
