@@ -40,7 +40,7 @@ export function FrontPageIntro({ onStart }: FrontPageIntroProps) {
                 </li>
                 <li>
                   <span className="font-semibold text-foreground">Tax planning requires coordination</span>{" "}
-                  (often CPA + advisor + attorney), and many professionals avoid stepping outside
+                  (often CPA, CFP, or attorney), and many professionals avoid stepping outside
                   their lane to reduce liability.
                 </li>
                 <li>
