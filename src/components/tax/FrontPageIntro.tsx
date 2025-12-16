@@ -9,11 +9,11 @@ export function FrontPageIntro() {
             TAX OPPORTUNITY FINDER
           </div>
 
-          <h1 className="mt-2 text-3xl lg:text-4xl xl:text-5xl font-semibold leading-tight text-textPrimary">
+          <h1 className="mt-2 font-semibold leading-tight text-textPrimary text-[clamp(2rem,3.2vw,3.25rem)]">
             Most people miss tax opportunities because nobody owns the conversation.
           </h1>
 
-          <p className="mt-3 text-lg lg:text-xl leading-normal text-textSecondary">
+          <p className="mt-3 leading-normal text-textSecondary text-[clamp(1.125rem,1.4vw,1.35rem)]">
             Long-term outcomes are often improved less by “beating the market” and more by
             reducing avoidable lifetime taxes — especially across income changes, account growth,
             and retirement distributions.
@@ -22,11 +22,11 @@ export function FrontPageIntro() {
 
         {/* Why overlooked */}
         <div className="rounded-lg bg-surfaceMuted border border-border p-6">
-          <h2 className="text-xl lg:text-2xl xl:text-3xl font-semibold text-textPrimary">
+          <h2 className="font-semibold text-textPrimary text-[clamp(1.375rem,1.9vw,2rem)]">
             Why this is often overlooked
           </h2>
 
-          <ul className="mt-3 space-y-2 text-base lg:text-lg leading-normal text-textSecondary">
+          <ul className="mt-3 space-y-2 leading-normal text-textSecondary text-[clamp(1rem,1.15vw,1.125rem)]">
             <li>
               <span className="font-semibold text-textPrimary">Most advisor relationships</span>{" "}
               are built around investments, not coordinated multi-year tax planning.
