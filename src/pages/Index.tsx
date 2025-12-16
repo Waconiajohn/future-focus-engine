@@ -41,7 +41,7 @@ const Index = () => {
   }
 
   if (view === "blunders") {
-    return <ThreeBlundersStep onContinue={() => setView("persona-select")} />;
+    return <ThreeBlundersStep onContinue={() => setView("persona-select")} onBack={() => setView("intro")} />;
   }
 
   if (view === "persona-select") {

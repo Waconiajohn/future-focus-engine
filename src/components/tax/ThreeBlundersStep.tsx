@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, AlertTriangle, Clock, TrendingUp } from "lucide-react";
+import { ArrowRight, ArrowLeft, Shield, AlertTriangle, Clock, TrendingUp } from "lucide-react";
 
 interface ThreeBlundersStepProps {
   onContinue: () => void;
+  onBack: () => void;
 }
 
-export function ThreeBlundersStep({ onContinue }: ThreeBlundersStepProps) {
+export function ThreeBlundersStep({ onContinue, onBack }: ThreeBlundersStepProps) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="container mx-auto px-4 py-6">
@@ -96,7 +97,16 @@ export function ThreeBlundersStep({ onContinue }: ThreeBlundersStepProps) {
           </div>
 
           {/* CTA */}
-          <div className="text-center opacity-0 animate-fade-up animation-delay-150">
+          <div className="flex justify-center gap-4 opacity-0 animate-fade-up animation-delay-150">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={onBack}
+              className="group"
+            >
+              <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+              Back
+            </Button>
             <Button 
               variant="sage" 
               size="xl" 
