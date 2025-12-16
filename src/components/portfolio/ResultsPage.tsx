@@ -87,6 +87,8 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
     "45-49": 47, "50-54": 52, "55-59": 57, "60-65": 62, "60-69": 65, "70+": 72,
   };
   const age = ageBandMidpoint[String(persona?.ageBand)] ?? 55;
+  const maritalStatus = persona?.maritalStatus;
+  const employmentStatus = (persona as any)?.employmentStatus;
   
   // Get top strategies (limited or all based on showAll)
   const displayedStrategies = showAll 
@@ -161,6 +163,8 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
                   defaultExpanded={true}
                   retirementRange={retirementRange}
                   age={age}
+                  maritalStatus={maritalStatus}
+                  employmentStatus={employmentStatus}
                 />
               ))}
             </div>
@@ -186,6 +190,8 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
                     defaultExpanded={false}
                     retirementRange={retirementRange}
                     age={age}
+                    maritalStatus={maritalStatus}
+                    employmentStatus={employmentStatus}
                   />
                 ))}
             </div>
