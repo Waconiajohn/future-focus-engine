@@ -5,75 +5,78 @@ import { IntroStep } from "@/components/steps/IntroStep";
 import { StoryCard } from "@/components/portfolio/StoryCard";
 import { StrategyCard } from "@/components/portfolio/StrategyCard";
 import { DisclosureFooter } from "@/components/portfolio/DisclosureFooter";
-import { evaluateStrategies, STRATEGIES } from "@/data/strategyCatalog";
-import type { Persona, TriggerResult } from "@/types/persona";
+import { matchStrategies } from "@/data/strategies";
+import { personaToUserProfile } from "@/domain/tax/profileAdapter";
+import type { Persona, MatchedStrategy } from "@/types/persona";
 import { Shield, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [view, setView] = useState<"intro" | "onboarding" | "results">("intro");
-  const [results, setResults] = useState<TriggerResult[]>([]);
+  const [matchedStrategies, setMatchedStrategies] = useState<MatchedStrategy[]>([]);
   const [persona, setPersona] = useState<Persona | null>(null);
 
   const handlePersonaComplete = (newPersona: Persona) => {
     setPersona(newPersona);
-    const matches = evaluateStrategies(newPersona);
-    
-    // Sort matches: High confidence -> Medium -> Low
-    const sorted = matches.sort((a, b) => {
-      const weight = { High: 3, Medium: 2, Low: 1 };
-      return weight[b.confidence] - weight[a.confidence];
-    });
-
-    setResults(sorted);
+    // Convert Persona to UserProfile and use the rich matchStrategies engine
+    const userProfile = personaToUserProfile(newPersona);
+    const strategies = matchStrategies(userProfile);
+    setMatchedStrategies(strategies);
     setView("results");
     window.scrollTo(0, 0);
   };
 
   const resetFlow = () => {
     setView("intro");
-    setResults([]);
+    setMatchedStrategies([]);
     setPersona(null);
   };
 
-  // Create a lookup map for strategies
-  const strategyMap = Object.fromEntries(STRATEGIES.map(s => [s.id, s]));
-
-  // Helper to get 3 top stories
+  // Helper to get 3 top stories based on matched strategies
   const getTopStories = () => {
     const stories: { title: string; insight: string; type: "tax" | "growth" | "income" }[] = [];
     
-    // Check for tax heavy strategies
-    const taxStrats = results.filter(r => 
-      strategyMap[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("tax") && r.confidence === "High"
+    // Check for high-impact tax strategies
+    const highImpactStrategies = matchedStrategies.filter(s => s.computedImpact === "high");
+    const taxStrategies = matchedStrategies.filter(s => 
+      s.category === "timing" || s.category === "withdrawal" || s.title?.toLowerCase().includes("tax") || s.title?.toLowerCase().includes("roth")
     );
-    if (taxStrats.length > 0) {
+    
+    if (taxStrategies.length > 0) {
       stories.push({
         title: "Tax Efficiency Opportunity",
-        insight: "Based on your profile, you have significant opportunities to reduce your lifetime tax burden through strategic planning.",
+        insight: `Based on your profile, you have ${taxStrategies.length} strategies to potentially reduce your lifetime tax burden.`,
         type: "tax"
       });
     }
 
-    // Check for income/growth
-    const incomeStrats = results.filter(r => 
-      (strategyMap[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("income") || 
-       strategyMap[r.strategyId]?.whyThisMayApply?.toLowerCase().includes("retirement")) && 
-       r.confidence === "High"
+    // Check for income/retirement strategies
+    const incomeStrategies = matchedStrategies.filter(s => 
+      s.category === "withdrawal" || s.category === "structure" || 
+      s.title?.toLowerCase().includes("retirement") || s.title?.toLowerCase().includes("income")
     );
-    if (incomeStrats.length > 0) {
+    if (incomeStrategies.length > 0) {
       stories.push({
         title: "Income & Retirement Security",
-        insight: `You have ${incomeStrats.length} high-impact strategies available to strengthen your retirement income stream and longevity protection.`,
+        insight: `You have ${incomeStrategies.length} strategies available to strengthen your retirement income stream.`,
         type: "income"
       });
     }
 
-    // If we need more, check matched count overall
-    if (stories.length < 2 && results.length > 5) {
+    // High-impact general
+    if (highImpactStrategies.length > 0 && stories.length < 2) {
       stories.push({
-        title: "Comprehensive Growth Strategy",
-        insight: `We identified ${results.length} total strategies relevant to your situation that could optimize your wealth accumulation.`,
+        title: "High-Impact Opportunities",
+        insight: `We identified ${highImpactStrategies.length} high-impact strategies relevant to your situation.`,
+        type: "growth"
+      });
+    }
+
+    // Fallback if we have strategies but no specific matches
+    if (stories.length === 0 && matchedStrategies.length > 0) {
+      stories.push({
+        title: "Comprehensive Planning",
+        insight: `We identified ${matchedStrategies.length} strategies worth exploring with a qualified professional.`,
         type: "growth"
       });
     }
@@ -135,22 +138,18 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-textPrimary">Recommended Strategies</h2>
             <span className="bg-primarySoft text-primary px-3 py-1 rounded-full text-xs font-semibold">
-              {results.length} Found
+              {matchedStrategies.length} Found
             </span>
           </div>
           
           <div className="grid gap-4">
-            {results.map((result) => {
-              const strategy = strategyMap[result.strategyId];
-              if (!strategy) return null;
-              return (
-                <StrategyCard 
-                  key={result.strategyId} 
-                  strategy={strategy} 
-                  onExplore={() => console.log("Explore", strategy.title)} 
-                />
-              );
-            })}
+            {matchedStrategies.map((strategy) => (
+              <StrategyCard 
+                key={strategy.id} 
+                strategy={strategy} 
+                onExplore={() => console.log("Explore", strategy.title)} 
+              />
+            ))}
           </div>
         </section>
 
