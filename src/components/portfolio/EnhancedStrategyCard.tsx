@@ -25,6 +25,7 @@ interface EnhancedStrategyCardProps {
   defaultExpanded?: boolean;
   retirementRange?: RetirementRange;
   age?: number;
+  ageBand?: string;
   maritalStatus?: string;
   employmentStatus?: string;
 }
@@ -34,6 +35,7 @@ export function EnhancedStrategyCard({
   defaultExpanded = false,
   retirementRange = "500k-1M",
   age = 55,
+  ageBand,
   maritalStatus,
   employmentStatus,
 }: EnhancedStrategyCardProps) {
@@ -47,6 +49,7 @@ export function EnhancedStrategyCard({
 
   const clientProfile = {
     age,
+    ageBand,
     retirementRange,
     maritalStatus,
     employmentStatus,

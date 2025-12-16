@@ -12,6 +12,7 @@ import { getStrategyExample } from '@/data/strategy-examples';
 export interface ClientProfile {
   name?: string;
   age?: number;
+  ageBand?: string;
   maritalStatus?: string;
   employmentStatus?: string;
   retirementRange?: RetirementRange;
@@ -116,7 +117,7 @@ export async function generateAdvisorBriefingPDF(data: BriefingData): Promise<vo
 
   const clientDetails = [
     ['Name:', clientProfile.name || 'Not provided'],
-    ['Age:', clientProfile.age ? `${clientProfile.age} years old` : 'Not provided'],
+    ['Age:', clientProfile.ageBand || 'Not provided'],
     ['Marital Status:', clientProfile.maritalStatus || 'Not provided'],
     ['Employment:', clientProfile.employmentStatus || 'Not provided'],
     ['Retirement Assets:', clientProfile.retirementRange || 'Not provided'],

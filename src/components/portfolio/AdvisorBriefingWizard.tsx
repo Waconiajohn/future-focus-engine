@@ -257,10 +257,10 @@ export function AdvisorBriefingWizard({
                     <User className="h-4 w-4" />
                     Client Profile
                   </h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
                       <span className="text-muted-foreground">Age:</span>{' '}
-                      {clientProfile.age || 'Not provided'}
+                      {clientProfile.ageBand || 'Not provided'}
                     </div>
                     <div>
                       <span className="text-muted-foreground">Marital Status:</span>{' '}
