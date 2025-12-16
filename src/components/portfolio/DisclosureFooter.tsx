@@ -13,7 +13,7 @@ export function DisclosureFooter({ className }: DisclosureFooterProps) {
         className
       )}
     >
-      <div className="max-w-px mx-auto space-y-2">
+      <div className="max-w-4xl mx-auto px-4 space-y-2 text-center">
         <p>
           <strong>Disclaimer:</strong> This application is for informational purposes only and does
           not constitute financial, tax, or legal advice. Strategies presented are based on

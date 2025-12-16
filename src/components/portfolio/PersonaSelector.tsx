@@ -15,22 +15,34 @@ interface PersonaSelectorProps {
 
 export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
   const [step, setStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   // State for persona
   const [ageBand, setAgeBand] = useState<AgeBand | null>(null);
   const [maritalStatus, setMaritalStatus] = useState<MaritalStatus | null>(null);
   const [employment, setEmployment] = useState<EmploymentStatus>("Employed");
+  const [spouseEmployment, setSpouseEmployment] = useState<EmploymentStatus>("Employed");
   const [retirementRange, setRetirementRange] = useState<RetirementRange | null>(null);
   const [realEstate, setRealEstate] = useState<RealEstateProfile>("None");
 
   const handleNext = () => {
-    if (step < totalSteps) setStep(step + 1);
-    else handleFinish();
+    // Skip spouse step if not married
+    if (step === 3 && maritalStatus !== "Married") {
+      setStep(step + 2); // Skip spouse employment step (go to step 5)
+    } else if (step < totalSteps) {
+      setStep(step + 1);
+    } else {
+      handleFinish();
+    }
   };
 
   const handleBack = () => {
-    if (step > 1) setStep(step - 1);
+    // Skip spouse step if not married when going back
+    if (step === 5 && maritalStatus !== "Married") {
+      setStep(step - 2);
+    } else if (step > 1) {
+      setStep(step - 1);
+    }
   };
 
   const handleFinish = () => {
@@ -39,9 +51,9 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
         ageBand,
         maritalStatus,
         employment,
+        spouseEmployment: maritalStatus === "Married" ? spouseEmployment : undefined,
         retirementRange,
         realEstate,
-        // Defaults for optional flags, could be expanded in a real app
         hasTaxableBrokerage: true, 
         hasHSA: true,
       });
@@ -53,8 +65,9 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
       case 1: return !!ageBand;
       case 2: return !!maritalStatus;
       case 3: return !!employment;
-      case 4: return !!retirementRange;
-      case 5: return !!realEstate;
+      case 4: return !!spouseEmployment;
+      case 5: return !!retirementRange;
+      case 6: return !!realEstate;
       default: return false;
     }
   };
@@ -103,14 +116,14 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
               </div>
             )}
 
-            {/* Step 3: Employment */}
+            {/* Step 3: Your Employment */}
             {step === 3 && (
               <div className="space-y-6 animate-fade-in">
                 <div className="text-center space-y-2">
                   <div className="inline-flex p-3 bg-blue-100 rounded-full text-blue-600 mb-2">
                     <Briefcase className="h-6 w-6" />
                   </div>
-                  <h2 className="text-xl font-bold text-textPrimary">Employment Status</h2>
+                  <h2 className="text-xl font-bold text-textPrimary">Your Employment Status</h2>
                   <p className="text-textSecondary">Identifies income shifting and benefit opportunities.</p>
                 </div>
                 <RadioGroup value={employment} onValueChange={(v) => setEmployment(v as EmploymentStatus)} className="grid grid-cols-1 gap-3">
@@ -142,8 +155,47 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
               </div>
             )}
 
-            {/* Step 4: Retirement Assets */}
+            {/* Step 4: Spouse Employment (only shown if married) */}
             {step === 4 && (
+              <div className="space-y-6 animate-fade-in">
+                <div className="text-center space-y-2">
+                  <div className="inline-flex p-3 bg-purple-100 rounded-full text-purple-600 mb-2">
+                    <Users className="h-6 w-6" />
+                  </div>
+                  <h2 className="text-xl font-bold text-textPrimary">Spouse&apos;s Employment Status</h2>
+                  <p className="text-textSecondary">This helps identify additional household planning opportunities.</p>
+                </div>
+                <RadioGroup value={spouseEmployment} onValueChange={(v) => setSpouseEmployment(v as EmploymentStatus)} className="grid grid-cols-1 gap-3">
+                  {[
+                    { val: "Employed", txt: "Employed (W-2)", desc: "Standard employment" },
+                    { val: "Consulting", txt: "Self-Employed / Consulting", desc: "1099 or Business Owner" },
+                    { val: "Severance", txt: "Recently Separated / Severance", desc: "Transitioning jobs" },
+                    { val: "Unemployed", txt: "Unemployed / Retired", desc: "No earned income" },
+                  ].map((opt) => (
+                    <div
+                      key={opt.val}
+                      className={cn(
+                        "relative flex items-center space-x-3 rounded-xl border-2 p-4 cursor-pointer transition-all hover:bg-surfaceMuted",
+                        spouseEmployment === opt.val ? "border-primary bg-primarySoft/30" : "border-transparent bg-surfaceMuted/50"
+                      )}
+                      onClick={() => setSpouseEmployment(opt.val as EmploymentStatus)}
+                    >
+                      <RadioGroupItem value={opt.val} id={`spouse-${opt.val}`} className="peer sr-only" />
+                      <div className="flex-1">
+                        <Label htmlFor={`spouse-${opt.val}`} className="text-base font-semibold cursor-pointer block text-textPrimary">
+                          {opt.txt}
+                        </Label>
+                        <p className="text-sm text-textMuted mt-0.5">{opt.desc}</p>
+                      </div>
+                      {spouseEmployment === opt.val && <Check className="h-5 w-5 text-primary" />}
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            )}
+
+            {/* Step 5: Retirement Assets */}
+            {step === 5 && (
               <div className="space-y-6 animate-fade-in">
                 <div className="text-center space-y-2">
                   <div className="inline-flex p-3 bg-emerald-100 rounded-full text-emerald-600 mb-2">
@@ -174,8 +226,8 @@ export function PersonaSelector({ onComplete }: PersonaSelectorProps) {
               </div>
             )}
 
-            {/* Step 5: Real Estate */}
-            {step === 5 && (
+            {/* Step 6: Real Estate */}
+            {step === 6 && (
               <div className="space-y-6 animate-fade-in">
                 <div className="text-center space-y-2">
                   <div className="inline-flex p-3 bg-amber-100 rounded-full text-amber-600 mb-2">
