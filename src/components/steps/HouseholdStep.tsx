@@ -178,7 +178,7 @@ export function HouseholdStep({ maritalStatus, onComplete, onBack }: HouseholdSt
       flow.push('primary-self-employed-fluctuates', 'primary-self-employed-cashflow');
     }
     
-    if (maritalStatus === 'married') {
+    if (maritalStatus === 'married' || maritalStatus === 'Married') {
       flow.push('spouse-employment');
       if (spouseEmploymentStatus === 'unemployed') {
         flow.push('spouse-duration', 'spouse-severance');

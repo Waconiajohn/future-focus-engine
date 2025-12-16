@@ -75,6 +75,7 @@ export type Persona = {
   ageBand: AgeBand;
   maritalStatus: MaritalStatus;
   employment: EmploymentStatus;
+  spouseEmployment?: EmploymentStatus;
   retirementRange: RetirementRange;
   realEstate: RealEstateProfile;
 
