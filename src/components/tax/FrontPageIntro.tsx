@@ -9,11 +9,11 @@ export function FrontPageIntro() {
             TAX OPPORTUNITY FINDER
           </div>
 
-          <h1 className="mt-2 text-3xl font-semibold leading-tight text-textPrimary">
+          <h1 className="mt-2 text-3xl lg:text-4xl xl:text-5xl font-semibold leading-tight text-textPrimary">
             Most people miss tax opportunities because nobody owns the conversation.
           </h1>
 
-          <p className="mt-3 text-lg leading-normal text-textSecondary">
+          <p className="mt-3 text-lg lg:text-xl leading-normal text-textSecondary">
             Long-term outcomes are often improved less by “beating the market” and more by
             reducing avoidable lifetime taxes — especially across income changes, account growth,
             and retirement distributions.
@@ -22,11 +22,11 @@ export function FrontPageIntro() {
 
         {/* Why overlooked */}
         <div className="rounded-lg bg-surfaceMuted border border-border p-6">
-          <h2 className="text-xl font-semibold text-textPrimary">
+          <h2 className="text-xl lg:text-2xl xl:text-3xl font-semibold text-textPrimary">
             Why this is often overlooked
           </h2>
 
-          <ul className="mt-3 space-y-2 text-base leading-normal text-textSecondary">
+          <ul className="mt-3 space-y-2 text-base lg:text-lg leading-normal text-textSecondary">
             <li>
               <span className="font-semibold text-textPrimary">Most advisor relationships</span>{" "}
               are built around investments, not coordinated multi-year tax planning.
@@ -47,8 +47,8 @@ export function FrontPageIntro() {
         {/* What it does / doesn’t */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="rounded-lg bg-surface border border-border p-6">
-            <h3 className="text-lg font-semibold text-textPrimary">What this tool does</h3>
-            <ul className="mt-3 space-y-2 text-base leading-normal text-textSecondary">
+            <h3 className="text-lg lg:text-xl font-semibold text-textPrimary">What this tool does</h3>
+            <ul className="mt-3 space-y-2 text-base lg:text-lg leading-normal text-textSecondary">
               <li>Identifies tax strategies that may be relevant based on your situation</li>
               <li>Uses short stories to show how similar households approach timing decisions</li>
               <li>Helps you prepare better questions for professional conversations</li>
@@ -56,8 +56,8 @@ export function FrontPageIntro() {
           </div>
 
           <div className="rounded-lg bg-surface border border-border p-6">
-            <h3 className="text-lg font-semibold text-textPrimary">What this tool does not do</h3>
-            <ul className="mt-3 space-y-2 text-base leading-normal text-textSecondary">
+            <h3 className="text-lg lg:text-xl font-semibold text-textPrimary">What this tool does not do</h3>
+            <ul className="mt-3 space-y-2 text-base lg:text-lg leading-normal text-textSecondary">
               <li>Provide tax, legal, or investment advice</li>
               <li>Calculate exact savings or produce “do this now” recommendations</li>
               <li>Replace your CPA, attorney, or financial professional</li>
