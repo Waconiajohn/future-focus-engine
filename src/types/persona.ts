@@ -16,7 +16,7 @@ export type ProfessionalTag =
 
 export type AgeBand = "45-49" | "50-54" | "55-59" | "60-65" | "60-69" | "70+";
 
-export type EmploymentStatus = "Employed" | "Unemployed" | "Severance" | "Consulting" | "employed" | "unemployed" | "self-employed" | "consulting" | "retired";
+export type EmploymentStatus = "Employed" | "Unemployed" | "RecentlyUnemployed" | "Severance" | "Consulting" | "employed" | "unemployed" | "self-employed" | "consulting" | "retired";
 
 export type MaritalStatus = "Single" | "Married" | "single" | "married";
 
