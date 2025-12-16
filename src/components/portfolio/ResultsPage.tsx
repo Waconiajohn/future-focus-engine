@@ -80,6 +80,13 @@ function getTopStrategies(strategies: MatchedStrategy[], limit: number): Matched
 export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPageProps) {
   const [showAll, setShowAll] = useState(false);
   
+  // Get user's details for personalized estimates
+  const retirementRange = persona?.retirementRange || "500k-1M";
+  const ageBandMidpoint: Record<string, number> = {
+    "45-49": 47, "50-54": 52, "55-59": 57, "60-65": 62, "60-69": 65, "70+": 72,
+  };
+  const age = ageBandMidpoint[String(persona?.ageBand)] ?? 55;
+  
   // Get top strategies (limited or all based on showAll)
   const displayedStrategies = showAll 
     ? matchedStrategies 
@@ -151,6 +158,8 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
                   key={strategy.id} 
                   strategy={strategy}
                   defaultExpanded={true}
+                  retirementRange={retirementRange}
+                  age={age}
                 />
               ))}
             </div>
@@ -174,6 +183,8 @@ export function ResultsPage({ matchedStrategies, persona, onRestart }: ResultsPa
                     key={strategy.id} 
                     strategy={strategy}
                     defaultExpanded={false}
+                    retirementRange={retirementRange}
+                    age={age}
                   />
                 ))}
             </div>

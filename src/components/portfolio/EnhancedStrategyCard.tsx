@@ -8,22 +8,32 @@ import {
   Clock, 
   Users, 
   Lightbulb,
-  CheckCircle2
+  CheckCircle2,
+  TrendingUp
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImpactBadge } from "./ImpactBadge";
-import type { Strategy } from "@/types/persona";
+import type { Strategy, RetirementRange } from "@/types/persona";
 import { getStrategyExample, type StrategyExample } from "@/data/strategy-examples";
+import { calculatePersonalizedEstimate, formatEstimate } from "@/lib/personalized-estimates";
 import { cn } from "@/lib/utils";
 
 interface EnhancedStrategyCardProps {
   strategy: Strategy;
   defaultExpanded?: boolean;
+  retirementRange?: RetirementRange;
+  age?: number;
 }
 
-export function EnhancedStrategyCard({ strategy, defaultExpanded = false }: EnhancedStrategyCardProps) {
+export function EnhancedStrategyCard({ 
+  strategy, 
+  defaultExpanded = false,
+  retirementRange = "500k-1M",
+  age = 55
+}: EnhancedStrategyCardProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const example = getStrategyExample(strategy.id);
+  const personalizedEstimate = calculatePersonalizedEstimate(strategy.id, retirementRange, age);
 
   const whatItIs = strategy.whatThisIs || strategy.description || "";
   const whyForYou = strategy.whyItAppears || strategy.whyForYou || strategy.triggerReason || "";
@@ -59,12 +69,12 @@ export function EnhancedStrategyCard({ strategy, defaultExpanded = false }: Enha
               {whatItIs.length > 150 ? whatItIs.slice(0, 150) + "..." : whatItIs}
             </p>
 
-            {/* Potential Savings Preview */}
-            {example && !isExpanded && (
+            {/* Personalized Savings Preview */}
+            {!isExpanded && (
               <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-                <DollarSign className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-700">
-                  Potential savings: {example.potentialSavings}
+                <TrendingUp className="h-4 w-4 text-green-600" />
+                <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                  Your estimated savings: {formatEstimate(personalizedEstimate)}
                 </span>
               </div>
             )}
@@ -128,16 +138,19 @@ export function EnhancedStrategyCard({ strategy, defaultExpanded = false }: Enha
 
                   {/* Key Details Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Potential Savings */}
+                    {/* Personalized Savings */}
                     <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-100 dark:border-green-900">
                       <div className="flex items-center gap-2 mb-2">
-                        <DollarSign className="h-4 w-4 text-green-600" />
+                        <TrendingUp className="h-4 w-4 text-green-600" />
                         <h4 className="text-sm font-semibold text-green-800 dark:text-green-300">
-                          Potential Savings
+                          Your Estimated Savings
                         </h4>
                       </div>
                       <p className="text-lg font-bold text-green-700 dark:text-green-400">
-                        {example.potentialSavings}
+                        {formatEstimate(personalizedEstimate)}
+                      </p>
+                      <p className="text-xs text-green-600 dark:text-green-500 mt-1">
+                        {personalizedEstimate.explanation}
                       </p>
                     </div>
 
