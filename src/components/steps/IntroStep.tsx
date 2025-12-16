@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield } from "lucide-react";
+import { ArrowRight, Shield, AlertTriangle, Clock, TrendingUp } from "lucide-react";
 
 interface IntroStepProps {
   onStart: () => void;
@@ -20,7 +20,7 @@ export function IntroStep({ onStart }: IntroStepProps) {
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
           {/* Hero Section */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6 leading-tight opacity-0 animate-fade-up">
               Discover Tax Strategies<br />
               <span className="text-sage">Worth Exploring</span>
@@ -32,8 +32,84 @@ export function IntroStep({ onStart }: IntroStepProps) {
             </p>
           </div>
 
+          {/* Three Costly Blunders Section */}
+          <div className="bg-gradient-to-br from-rose-50 to-amber-50 dark:from-rose-950/30 dark:to-amber-950/30 rounded-2xl p-6 sm:p-8 mb-12 border border-rose-100 dark:border-rose-900/50 opacity-0 animate-fade-up animation-delay-150">
+            <div className="text-center mb-6">
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 rounded-full text-sm font-medium mb-3">
+                <AlertTriangle className="h-4 w-4" />
+                Common Retirement Tax Mistakes
+              </span>
+              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-foreground">
+                Three Costly Blunders That Can Spoil Your Retirement
+              </h2>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Most retirees are shocked to learn that taxes can be their largest expense in retirement.
+              </p>
+            </div>
+
+            <div className="grid gap-4">
+              {/* Blunder 1 */}
+              <div className="flex gap-4 p-4 bg-white/60 dark:bg-background/40 rounded-xl">
+                <div className="shrink-0 w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
+                  <span className="text-rose-600 dark:text-rose-400 font-bold">1</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">No Withdrawal Plan</h3>
+                  <p className="text-sm text-muted-foreground">
+                    You had a strategy to save, but no plan for tax-efficient withdrawals. Without one, 
+                    you could pay significantly more in taxes than necessary once RMDs and large withdrawals kick in.
+                  </p>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 font-medium mt-2">
+                    💡 One couple saved ~$790,000 in lifetime taxes by implementing Roth conversions and timing distributions strategically.
+                  </p>
+                </div>
+              </div>
+
+              {/* Blunder 2 */}
+              <div className="flex gap-4 p-4 bg-white/60 dark:bg-background/40 rounded-xl">
+                <div className="shrink-0 w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">Ignoring RMD "Tax Bombs"</h3>
+                  <p className="text-sm text-muted-foreground">
+                    At age 73, the IRS forces Required Minimum Distributions from traditional retirement accounts. 
+                    These can push you into higher brackets and spike taxes on Social Security and Medicare premiums.
+                  </p>
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-2">
+                    💡 One couple avoided ~$490,000 in taxes using QCDs and partial Roth conversions to manage RMDs.
+                  </p>
+                </div>
+              </div>
+
+              {/* Blunder 3 */}
+              <div className="flex gap-4 p-4 bg-white/60 dark:bg-background/40 rounded-xl">
+                <div className="shrink-0 w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">Failing to Plan for Higher Rates</h3>
+                  <p className="text-sm text-muted-foreground">
+                    We are in a historically low tax regime scheduled to sunset. Many experts anticipate higher 
+                    tax rates ahead. Without preparation, future hikes could delay retirement or force lifestyle cuts.
+                  </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-2">
+                    💡 One family saved ~$225,000 through proactive tax optimization, allowing them to retire on time.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-foreground/80 font-medium">
+                The good news? <span className="text-sage">It's not too late.</span> By avoiding these mistakes, 
+                you can potentially save tens or even hundreds of thousands over your retirement.
+              </p>
+            </div>
+          </div>
+
           {/* Why This Is Often Overlooked */}
-          <div className="bg-card/50 rounded-2xl p-6 mb-12 text-left opacity-0 animate-fade-up animation-delay-150">
+          <div className="bg-card/50 rounded-2xl p-6 mb-12 text-left opacity-0 animate-fade-up animation-delay-200">
             <h2 className="font-serif text-xl font-semibold text-foreground mb-4">
               Why This Is Often Overlooked
             </h2>
