@@ -8,11 +8,13 @@ import {
   CalendarClock, 
   Building2, 
   Home,
-  ChevronRight
+  ChevronRight,
+  UserX
 } from "lucide-react";
 
 export type PersonaType = 
-  | "pre-retiree" 
+  | "pre-retiree-transition" 
+  | "pre-retiree-employed" 
   | "early-retiree" 
   | "rmd-age" 
   | "business-owner" 
@@ -29,10 +31,18 @@ interface PersonaOption {
 
 const PERSONA_OPTIONS: PersonaOption[] = [
   {
-    id: "pre-retiree",
-    title: "Pre-Retiree",
+    id: "pre-retiree-transition",
+    title: "Pre-Retiree (In Transition)",
+    description: "Unemployed, job searching, or recently separated from employer",
+    ageHint: "Typically 45-62",
+    icon: <UserX className="h-6 w-6" />,
+    color: "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
+  },
+  {
+    id: "pre-retiree-employed",
+    title: "Pre-Retiree (Employed)",
     description: "Still working, planning ahead for retirement",
-    ageHint: "Typically 45-59",
+    ageHint: "Typically 45-62",
     icon: <Briefcase className="h-6 w-6" />,
     color: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
   },
