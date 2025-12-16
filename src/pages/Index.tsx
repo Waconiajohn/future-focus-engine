@@ -46,7 +46,7 @@ const Index = () => {
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-primarySoft mb-4">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Tax Opportunity Explorer</h1>
+          <h1 className="text-3xl font-serif font-semibold text-foreground tracking-tight">Tax Opportunity Explorer</h1>
           <p className="mt-2 text-lg text-muted-foreground">
             Let's find the strategies most relevant to your situation.
           </p>
@@ -63,7 +63,7 @@ const Index = () => {
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-primarySoft mb-4">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Tax Opportunity Explorer</h1>
+          <h1 className="text-3xl font-serif font-semibold text-foreground tracking-tight">Tax Opportunity Explorer</h1>
           <p className="mt-2 text-lg text-muted-foreground">
             Answer a few questions to discover relevant strategies.
           </p>
