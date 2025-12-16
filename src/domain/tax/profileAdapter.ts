@@ -29,14 +29,10 @@ function normalizeRetirementRange(v: RetirementRange): RetirementRange {
   const s = String(v).toLowerCase().replace(/\s+/g, "");
   if (s === "<250k") return "<250k";
   if (s === "250k-500k") return "250k-500k";
-  if (s === "500k-1m" || s === "500k-1m" || s === "500k-1m") return "500k-1m" as RetirementRange;
-  if (s === "1m-2.5m") return "1m-2.5m" as RetirementRange;
-  if (s === "2.5m-5m") return "2.5m-5m" as RetirementRange;
-  if (s === "5m+" || s === ">5m") return ">5m" as RetirementRange;
-  // if the TitleCase ones come in
   if (s === "500k-1m") return "500k-1m" as RetirementRange;
   if (s === "1m-2.5m") return "1m-2.5m" as RetirementRange;
   if (s === "2.5m-5m") return "2.5m-5m" as RetirementRange;
+  if (s === "5m+" || s === ">5m") return ">5m" as RetirementRange;
   return v;
 }
 
