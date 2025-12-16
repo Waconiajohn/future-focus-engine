@@ -74,6 +74,10 @@
     --sage: 151 55% 41%;
     --sage-light: 151 55% 95%;
     --sage-foreground: 0 0% 100%;
+
+    /* Additional semantic colors */
+    --primarySoft: 196 65% 95%;
+    --warm-gray: 215 16% 60%;
   }
 
   /* Safe area for notched devices */
